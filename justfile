@@ -1,29 +1,29 @@
-default:
+_default:
     @just --list
 
 # rebuild and switch to new configuration
 rebuild:
-    sudo nixos-rebuild switch --flake ~/code/nixos-config#north
+    sudo nixos-rebuild switch --flake $(pwd)#north
 
 # rebuild but only activate on next boot
 boot:
-    sudo nixos-rebuild boot --flake ~/code/nixos-config#north
+    sudo nixos-rebuild boot --flake $(pwd)#north
 
 # test new configuration (rollback on next boot)
 test:
-    sudo nixos-rebuild test --flake ~/code/nixos-config#north
+    sudo nixos-rebuild test --flake $(pwd)#north
 
 # show what would change
 dry:
-    nixos-rebuild dry-activate --flake ~/code/nixos-config#north
+    nixos-rebuild dry-activate --flake $(pwd)#north
 
 # update flake inputs (nixpkgs etc.)
 update:
-    nix flake update --flake ~/code/nixos-config
+    nix flake update --flake $(pwd)
 
 # diff between current and new generation
 diff:
-    nixos-rebuild build --flake ~/code/nixos-config#north && nvd diff /run/current-system result
+    nixos-rebuild build --flake $(pwd)#north && nvd diff /run/current-system result
 
 # list generations
 generations:
