@@ -16,7 +16,7 @@
   networking.hostName = "framework";
   networking.networkmanager.enable = true;
 
-  time.timeZone = "Europe/Athens";
+  time.timeZone = "Europe/Berlin";
   i18n.defaultLocale = "en_US.UTF-8";
 
   # Sound

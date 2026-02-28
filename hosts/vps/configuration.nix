@@ -20,7 +20,7 @@
   networking.hostName = "vps";
   networking.useDHCP = true;
 
-  time.timeZone = "Europe/Athens";
+  time.timeZone = "Europe/Berlin";
   i18n.defaultLocale = "en_US.UTF-8";
 
   # Docker
