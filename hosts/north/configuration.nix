@@ -4,7 +4,7 @@
   imports =
     [ ./hardware-configuration.nix
       ../../modules/desktop.nix
-      ../../modules/devtools.nix
+      ../../modules/core.nix
       ../../modules/remote-access.nix
     ];
 
@@ -38,7 +38,7 @@
 
   security.sudo = {
     enable = true;
-    wheelNeedsPassword = true;
+    wheelNeedsPassword = false;
   };
 
   programs.zsh.enable = true;

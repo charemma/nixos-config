@@ -8,17 +8,13 @@
     vimAlias = true;
   };
 
-  programs.bat.enable = true;
+  programs.zsh.enable = true;
 
   environment.systemPackages = with pkgs; [
-    claude-code
     curl
     git
-    glow
     htop
-    starship
     tmux
     wget
-    yazi
   ];
 }
