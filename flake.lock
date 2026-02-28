@@ -3,11 +3,11 @@
     "charemma-web": {
       "flake": false,
       "locked": {
-        "lastModified": 1772307271,
-        "narHash": "sha256-tc9iiqJsvP81mXrrDPFPInmBsqvZbIpFmIPDHBf6f/s=",
+        "lastModified": 1772308817,
+        "narHash": "sha256-OddeVf4MJ/YrYYwt+PK4MRdqFVfB8MUqicekjddiFIA=",
         "owner": "charemma",
         "repo": "charemma-web",
-        "rev": "2234a991a5d1f83eacbb61ccf34dd8a1ad000860",
+        "rev": "2237dce8ca1d59652c3a405e212057d3ae564010",
         "type": "github"
       },
       "original": {

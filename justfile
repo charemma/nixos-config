@@ -16,7 +16,7 @@ test host="north":
 # deploy vps config to charemma.de
 deploy-vps:
     nix flake update charemma-web --flake "$(pwd)"
-    nixos-rebuild switch --flake "$(pwd)#vps" --target-host charemma@charemma.de --build-host charemma@charemma.de --sudo
+    nix shell nixpkgs#nixos-rebuild -c nixos-rebuild switch --flake "$(pwd)#vps" --target-host charemma@charemma.de --build-host charemma@charemma.de --sudo
 
 # show what would change
 dry host="north":
