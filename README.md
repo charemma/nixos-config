@@ -6,9 +6,7 @@ NixOS system configurations managed via flakes. Modular setup with per-host conf
 
 ```
 hosts/
-  north/                  workstation (AMD, dual-boot with Debian)
-    configuration.nix     host-specific config (user, boot, networking)
-    hardware-configuration.nix
+  north/                  build workstation
 modules/
   core.nix                essentials (git, neovim, tmux, gh, ...)
   desktop.nix             GUI (niri, kitty, brave, waybar, ...)

@@ -5,6 +5,10 @@
     enable = true;
     displayManager.lightdm.enable = true;
     windowManager.i3.enable = true;
+    xkb = {
+      layout = "us,gr";
+      options = "grp:alt_shift_toggle";
+    };
   };
 
   # Niri as Wayland alternative
@@ -27,7 +31,8 @@
     fuzzel
     kitty
     pavucontrol
-    polybar
+    pulseaudio
+    (polybar.override { pulseSupport = true; })
     rofi
     xterm
   ];
