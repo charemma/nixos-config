@@ -3,31 +3,32 @@ _default:
 
 # rebuild and switch to new configuration
 rebuild host="north":
-    sudo nixos-rebuild switch --flake $(pwd)#{host}
+    sudo nixos-rebuild switch --flake "$(pwd)#{{host}}"
 
 # rebuild but only activate on next boot
 boot host="north":
-    sudo nixos-rebuild boot --flake $(pwd)#{host}
+    sudo nixos-rebuild boot --flake "$(pwd)#{{host}}"
 
 # test new configuration (rollback on next boot)
 test host="north":
-    sudo nixos-rebuild test --flake $(pwd)#{host}
+    sudo nixos-rebuild test --flake "$(pwd)#{{host}}"
 
 # deploy vps config to charemma.de
 deploy-vps:
-    nixos-rebuild switch --flake $(pwd)#vps --target-host charemma@charemma.de --build-host charemma@charemma.de --sudo
+    nix flake update charemma-web --flake "$(pwd)"
+    nixos-rebuild switch --flake "$(pwd)#vps" --target-host charemma@charemma.de --build-host charemma@charemma.de --sudo
 
 # show what would change
 dry host="north":
-    nixos-rebuild dry-activate --flake $(pwd)#{host}
+    nixos-rebuild dry-activate --flake "$(pwd)#{{host}}"
 
 # update flake inputs (nixpkgs etc.)
 update:
-    nix flake update --flake $(pwd)
+    nix flake update --flake "$(pwd)"
 
 # diff between current and new generation
 diff:
-    nixos-rebuild build --flake $(pwd)#north && nvd diff /run/current-system result
+    nixos-rebuild build --flake "$(pwd)#north" && nvd diff /run/current-system result
 
 # list generations
 generations:
