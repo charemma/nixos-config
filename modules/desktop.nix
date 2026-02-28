@@ -18,6 +18,7 @@
     feh
     fuzzel
     kitty
+    flameshot
 
     # i3/X11 fallback
     i3
