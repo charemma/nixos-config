@@ -24,12 +24,20 @@
     touchpad.naturalScrolling = true;
   };
 
+  programs.neovim = {
+    enable = true;
+    defaultEditor = true;
+    viAlias = true;
+    vimAlias = true;
+  };
+
   environment.systemPackages = with pkgs; [
     brave
     feh
     flameshot
     fuzzel
     kitty
+    keepassxc
     pavucontrol
     pulseaudio
     (polybar.override { pulseSupport = true; })

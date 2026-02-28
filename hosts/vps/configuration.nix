@@ -3,19 +3,12 @@
 {
   imports = [
     (modulesPath + "/profiles/qemu-guest.nix")
+    ./disko-config.nix
     ../../modules/core.nix
     ../../modules/remote-access.nix
   ];
 
-  boot.loader.grub = {
-    enable = true;
-    device = "/dev/sda";
-  };
-
-  fileSystems."/" = {
-    device = "/dev/sda1";
-    fsType = "ext4";
-  };
+  boot.loader.grub.enable = true;
 
   networking.hostName = "vps";
   networking.useDHCP = true;
@@ -36,7 +29,7 @@
     shell = pkgs.zsh;
     initialHashedPassword = "";
     openssh.authorizedKeys.keys = [
-      # add public key here after bootstrap
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICbWNkSKK+ytdkDGGbol8VWlKOSJgZh+GLGWgGaDsEJv charemma@north"
     ];
   };
 

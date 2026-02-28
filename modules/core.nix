@@ -1,12 +1,8 @@
 { config, lib, pkgs, ... }:
 
 {
-  programs.neovim = {
-    enable = true;
-    defaultEditor = true;
-    viAlias = true;
-    vimAlias = true;
-  };
+  programs.vim.enable = true;
+  environment.sessionVariables.EDITOR = lib.mkDefault "vim";
 
   programs.zsh.enable = true;
 
