@@ -1,8 +1,8 @@
 # nixos-config
 
 Declarative NixOS system configurations managed via flakes. Modular setup with
-per-host configs and shared modules -- from a build workstation to a headless
-Raspberry Pi 5.
+per-host configs and shared modules -- from a build workstation to a portable
+pentest laptop to a headless VPS.
 
 ## How it works
 
@@ -26,6 +26,8 @@ All actual configuration stays here, `nixos-rebuild` just follows the redirect.
 | Host | Arch | Purpose |
 |------|------|---------|
 | `north` | x86_64 | Build workstation -- full desktop (niri/i3), infosec tooling, sound, graphics |
+| `framework` | x86_64 | Framework Laptop 12 -- portable pentest machine, full desktop + infosec |
+| `vps` | x86_64 | VPS for charemma.de -- Docker host, SSH only |
 | `rpi5` | aarch64 | Headless Raspberry Pi 5 server -- SSH, core utils, no desktop |
 
 ## Modules
@@ -36,6 +38,7 @@ Shared modules under `modules/` that hosts import selectively:
 - **desktop.nix** -- display/WM (niri + i3 fallback via lightdm), GUI apps (brave, kitty, waybar), input config
 - **remote-access.nix** -- SSH + xRDP with niri session, firewall port 3389
 - **infosec.nix** -- security/pentest tooling: recon (nmap, ffuf, gobuster), exploitation (metasploit, hashcat, hydra, sqlmap), web (burpsuite, httpie), networking (proxychains, socat)
+- **laptop.nix** -- power management (TLP), backlight control, lid switch behavior, battery thresholds, touchpad config
 
 ## Usage
 
