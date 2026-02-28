@@ -1,12 +1,14 @@
 { config, lib, pkgs, ... }:
 
 {
-  programs.i3.enable = true;
-
-  services.displayManager.sddm = {
+  services.xserver = {
     enable = true;
-    wayland.enable = true;
+    displayManager.lightdm.enable = true;
+    windowManager.i3.enable = true;
   };
+
+  # Niri as Wayland alternative
+  programs.niri.enable = true;
 
   services.gnome.gnome-keyring.enable = true;
   xdg.portal.enable = true;
@@ -15,12 +17,9 @@
   environment.systemPackages = with pkgs; [
     brave
     feh
+    flameshot
     fuzzel
     kitty
-    flameshot
-
-    # i3/X11 fallback
-    i3
     polybar
     rofi
     xterm
