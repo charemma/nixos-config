@@ -13,6 +13,10 @@ boot host="north":
 test host="north":
     sudo nixos-rebuild test --flake $(pwd)#{host}
 
+# deploy to remote host (builds on remote)
+deploy host user="charemma":
+    nixos-rebuild switch --flake $(pwd)#{{host}} --target-host {{user}}@{{host}} --build-host {{user}}@{{host}} --sudo
+
 # show what would change
 dry host="north":
     nixos-rebuild dry-activate --flake $(pwd)#{host}
