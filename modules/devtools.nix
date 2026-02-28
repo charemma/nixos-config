@@ -8,10 +8,7 @@
     vimAlias = true;
   };
 
-  programs.bat = {
-    enable = true;
-    catAlias = true;
-  };
+  programs.bat.enable = true;
 
   environment.systemPackages = with pkgs; [
     claude-code
