@@ -38,7 +38,7 @@
 
   security.sudo = {
     enable = true;
-    wheelNeedsPassword = false;
+    wheelNeedsPassword = true;
   };
 
   programs.zsh.enable = true;

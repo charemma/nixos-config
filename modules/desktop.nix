@@ -14,13 +14,10 @@
   xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
 
   environment.systemPackages = with pkgs; [
-    adwaita-icon-theme
     brave
     feh
     fuzzel
     kitty
-    mako
-    waybar
 
     # i3/X11 fallback
     i3

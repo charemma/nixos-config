@@ -8,6 +8,11 @@
     vimAlias = true;
   };
 
+  programs.bat = {
+    enable = true;
+    catAlias = true;
+  };
+
   environment.systemPackages = with pkgs; [
     claude-code
     curl
