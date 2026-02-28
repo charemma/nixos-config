@@ -14,6 +14,12 @@
   xdg.portal.enable = true;
   xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
 
+  services.libinput = {
+    enable = true;
+    mouse.naturalScrolling = true;
+    touchpad.naturalScrolling = true;
+  };
+
   environment.systemPackages = with pkgs; [
     brave
     feh

@@ -6,6 +6,7 @@
       ../../modules/desktop.nix
       ../../modules/core.nix
       ../../modules/remote-access.nix
+      ../../modules/infosec.nix
     ];
 
   boot.loader.systemd-boot.enable = true;
