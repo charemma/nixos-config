@@ -12,7 +12,7 @@
   boot.loader.efi.canTouchEfiVariables = true;
   boot.loader.efi.efiSysMountPoint = "/boot/efi";
 
-  networking.hostName = "nixbox";
+  networking.hostName = "north";
   networking.networkmanager.enable = true;
 
   time.timeZone = "Europe/Athens";
