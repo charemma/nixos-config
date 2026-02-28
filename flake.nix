@@ -5,11 +5,15 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     disko.url = "github:nix-community/disko";
     disko.inputs.nixpkgs.follows = "nixpkgs";
+    charemma-web = {
+      url = "github:charemma/charemma-web";
+      flake = false;
+    };
     nixos-hardware.url = "github:NixOS/nixos-hardware";
     raspberry-pi-nix.url = "github:nix-community/raspberry-pi-nix";
   };
 
-  outputs = { self, nixpkgs, disko, nixos-hardware, raspberry-pi-nix, ... }: {
+  outputs = { self, nixpkgs, disko, charemma-web, nixos-hardware, raspberry-pi-nix, ... }: {
     nixosConfigurations = {
       north = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
@@ -28,6 +32,7 @@
 
       vps = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
+        specialArgs = { inherit charemma-web; };
         modules = [
           disko.nixosModules.disko
           ./hosts/vps/configuration.nix

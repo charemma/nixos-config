@@ -27,7 +27,7 @@ All actual configuration stays here, `nixos-rebuild` just follows the redirect.
 |------|------|---------|
 | `north` | x86_64 | Build workstation -- full desktop (niri/i3), infosec tooling, sound, graphics |
 | `framework` | x86_64 | Framework Laptop 12 -- portable pentest machine, full desktop + infosec |
-| `vps` | x86_64 | VPS for charemma.de -- Docker host, SSH only |
+| `vps` | x86_64 | VPS for charemma.de -- Caddy web server, site content via flake input |
 | `rpi5` | aarch64 | Headless Raspberry Pi 5 server -- SSH, core utils, no desktop |
 
 ## Modules

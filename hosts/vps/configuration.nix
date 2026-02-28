@@ -1,4 +1,4 @@
-{ config, lib, pkgs, modulesPath, ... }:
+{ config, lib, pkgs, modulesPath, charemma-web, ... }:
 
 {
   imports = [
@@ -12,12 +12,29 @@
 
   networking.hostName = "vps";
   networking.useDHCP = true;
+  networking.firewall.allowedTCPPorts = [ 80 443 ];
 
   time.timeZone = "Europe/Berlin";
   i18n.defaultLocale = "en_US.UTF-8";
 
-  # Docker
-  virtualisation.docker.enable = true;
+  # Caddy web server for charemma.de
+  services.caddy = {
+    enable = true;
+    virtualHosts."charemma.de" = {
+      serverAliases = [ "www.charemma.de" ];
+      extraConfig = ''
+        root * ${charemma-web}/html
+        file_server
+        encode gzip
+
+        header {
+          X-Content-Type-Options nosniff
+          X-Frame-Options DENY
+          Referrer-Policy strict-origin-when-cross-origin
+        }
+      '';
+    };
+  };
 
   # User
   users.groups.charemma.gid = 1000;
@@ -25,7 +42,7 @@
     isNormalUser = true;
     uid = 1000;
     group = "charemma";
-    extraGroups = [ "wheel" "docker" ];
+    extraGroups = [ "wheel" ];
     shell = pkgs.zsh;
     initialHashedPassword = "";
     openssh.authorizedKeys.keys = [

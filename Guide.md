@@ -20,12 +20,12 @@ All rebuild commands require sudo and operate via `nixos-rebuild --flake .#<host
 
 ## Architecture
 
-Flake-based NixOS config on nixpkgs unstable. Three flake inputs: nixpkgs, nixos-hardware, and raspberry-pi-nix.
+Flake-based NixOS config on nixpkgs unstable. Flake inputs: nixpkgs, disko, charemma-web, nixos-hardware, and raspberry-pi-nix.
 
 **Hosts:**
 - `north` (x86_64) -- build workstation, imports core, desktop, remote-access, infosec
 - `framework` (x86_64) -- Framework Laptop 12, portable pentest machine, imports core, desktop, remote-access, infosec, laptop. Uses nixos-hardware for firmware/fingerprint
-- `vps` (x86_64) -- VPS for charemma.de, Docker host, imports core + remote-access. Uses qemu-guest profile
+- `vps` (x86_64) -- VPS for charemma.de, Caddy web server, imports core + remote-access. Site content pulled from charemma-web flake input. Uses qemu-guest profile
 - `rpi5` (aarch64) -- headless Raspberry Pi 5 server, imports core + remote-access only
 
 **Host configs** (`hosts/<name>/configuration.nix`) own: bootloader, networking, locale, user account, and select which modules to import.
