@@ -12,6 +12,7 @@
 
   environment.systemPackages = with pkgs; [
     curl
+    fastfetch
     gh
     git
     htop

@@ -26,6 +26,7 @@
     flameshot
     fuzzel
     kitty
+    pavucontrol
     polybar
     rofi
     xterm

@@ -2,20 +2,20 @@ _default:
     @just --list
 
 # rebuild and switch to new configuration
-rebuild:
-    sudo nixos-rebuild switch --flake $(pwd)#north
+rebuild host="north":
+    sudo nixos-rebuild switch --flake $(pwd)#{host}
 
 # rebuild but only activate on next boot
-boot:
-    sudo nixos-rebuild boot --flake $(pwd)#north
+boot host="north":
+    sudo nixos-rebuild boot --flake $(pwd)#{host}
 
 # test new configuration (rollback on next boot)
-test:
-    sudo nixos-rebuild test --flake $(pwd)#north
+test host="north":
+    sudo nixos-rebuild test --flake $(pwd)#{host}
 
 # show what would change
-dry:
-    nixos-rebuild dry-activate --flake $(pwd)#north
+dry host="north":
+    nixos-rebuild dry-activate --flake $(pwd)#{host}
 
 # update flake inputs (nixpkgs etc.)
 update:
