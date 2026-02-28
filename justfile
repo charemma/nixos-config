@@ -13,9 +13,9 @@ boot host="north":
 test host="north":
     sudo nixos-rebuild test --flake $(pwd)#{host}
 
-# deploy to remote host (builds on remote)
-deploy host user="charemma":
-    nixos-rebuild switch --flake $(pwd)#{{host}} --target-host {{user}}@{{host}} --build-host {{user}}@{{host}} --sudo
+# deploy vps config to charemma.de
+deploy-vps:
+    nixos-rebuild switch --flake $(pwd)#vps --target-host charemma@charemma.de --build-host charemma@charemma.de --sudo
 
 # show what would change
 dry host="north":
