@@ -27,6 +27,8 @@
 
     # Web
     httpie
+    burpsuite
+    # mitmproxy -- broken on nixpkgs-unstable (dependency version mismatch)
 
     # Scripting
     python3
