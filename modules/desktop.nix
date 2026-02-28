@@ -1,8 +1,7 @@
 { config, lib, pkgs, ... }:
 
 {
-  # Niri Wayland compositor
-  programs.niri.enable = true;
+  programs.i3.enable = true;
 
   services.displayManager.sddm = {
     enable = true;

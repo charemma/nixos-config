@@ -15,6 +15,7 @@
     gh
     git
     htop
+    just
     tmux
     wget
   ];
