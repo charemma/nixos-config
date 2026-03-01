@@ -38,6 +38,8 @@
     fuzzel
     kitty
     keepassxc
+    obsidian
+    typora
     pavucontrol
     pulseaudio
     (polybar.override { pulseSupport = true; })
