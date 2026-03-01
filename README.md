@@ -27,7 +27,7 @@ All actual configuration stays here, `nixos-rebuild` just follows the redirect.
 |------|------|---------|
 | `north` | x86_64 | Build workstation -- full desktop (niri/i3), infosec tooling, sound, graphics |
 | `framework` | x86_64 | Framework Laptop 12 -- portable pentest machine, full desktop + infosec |
-| `vps` | x86_64 | VPS for charemma.de -- Caddy web server, site content via flake input |
+| `vps` | x86_64 | VPS for charemma.de -- k3s with Traefik ingress, website served as container from ghcr.io |
 | `rpi5` | aarch64 | Headless Raspberry Pi 5 server -- SSH, core utils, no desktop |
 
 ## Modules
@@ -48,6 +48,8 @@ Everything goes through the justfile:
 just rebuild [host]       rebuild and switch to new configuration
 just boot [host]          rebuild, activate on next boot
 just test [host]          test config (rollback on next boot)
+just deploy-vps           deploy vps config to charemma.de
+just deploy-web           apply k8s manifests to the vps
 just dry [host]           show what would change
 just diff                 diff current vs new generation (nvd)
 just update               update flake inputs
