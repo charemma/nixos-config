@@ -1,4 +1,4 @@
-{ config, lib, pkgs, modulesPath, charemma-web, ... }:
+{ config, lib, pkgs, modulesPath, ... }:
 
 {
   imports = [
@@ -12,28 +12,44 @@
 
   networking.hostName = "vps";
   networking.useDHCP = true;
-  networking.firewall.allowedTCPPorts = [ 80 443 ];
+  networking.firewall.allowedTCPPorts = [ 80 443 6443 ];
 
   time.timeZone = "Europe/Berlin";
   i18n.defaultLocale = "en_US.UTF-8";
 
-  # Caddy web server for charemma.de
-  services.caddy = {
+  # k3s lightweight kubernetes
+  services.k3s = {
     enable = true;
-    virtualHosts."charemma.de" = {
-      serverAliases = [ "www.charemma.de" ];
-      extraConfig = ''
-        root * ${charemma-web}/html
-        file_server
-        encode gzip
+    role = "server";
+    extraFlags = toString [
+      "--tls-san=charemma.de"
+    ];
+  };
 
-        header {
-          X-Content-Type-Options nosniff
-          X-Frame-Options DENY
-          Referrer-Policy strict-origin-when-cross-origin
-        }
-      '';
+  # Traefik Let's Encrypt config via HelmChartConfig (k3s auto-deploy)
+  systemd.services.k3s-traefik-config = {
+    description = "Deploy Traefik HelmChartConfig for Let's Encrypt";
+    after = [ "k3s.service" ];
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
     };
+    script = ''
+      cp ${pkgs.writeText "traefik-config.yaml" ''
+        apiVersion: helm.cattle.io/v1
+        kind: HelmChartConfig
+        metadata:
+          name: traefik
+          namespace: kube-system
+        spec:
+          valuesContent: |-
+            additionalArguments:
+              - "--certificatesresolvers.letsencrypt.acme.email=info@charemma.de"
+              - "--certificatesresolvers.letsencrypt.acme.storage=/data/acme.json"
+              - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
+      ''} /var/lib/rancher/k3s/server/manifests/traefik-config.yaml
+    '';
   };
 
   # User
@@ -55,6 +71,7 @@
     wheelNeedsPassword = false;
   };
 
+  programs.bash.enable = true;
   programs.zsh.enable = true;
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];

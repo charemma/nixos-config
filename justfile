@@ -15,8 +15,11 @@ test host="north":
 
 # deploy vps config to charemma.de
 deploy-vps:
-    nix flake update charemma-web --flake "$(pwd)"
     nix shell nixpkgs#nixos-rebuild -c nixos-rebuild switch --flake "$(pwd)#vps" --target-host charemma@charemma.de --build-host charemma@charemma.de --sudo
+
+# apply k8s manifests to vps
+deploy-web:
+    cat "$HOME/code/charemma-web/k8s/"*.yaml | ssh charemma@charemma.de "sudo kubectl apply -f -"
 
 # show what would change
 dry host="north":
