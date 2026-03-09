@@ -7,12 +7,15 @@
     disko.inputs.nixpkgs.follows = "nixpkgs";
     nixos-hardware.url = "github:NixOS/nixos-hardware";
     raspberry-pi-nix.url = "github:nix-community/raspberry-pi-nix";
+    termfilechooser.url = "github:charemma/xdg-desktop-portal-termfilechooser";
+    termfilechooser.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, disko, nixos-hardware, raspberry-pi-nix, ... }: {
+  outputs = { self, nixpkgs, disko, nixos-hardware, raspberry-pi-nix, termfilechooser, ... }: {
     nixosConfigurations = {
       north = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
+        specialArgs = { inherit termfilechooser; };
         modules = [
           ./hosts/north/configuration.nix
         ];
@@ -20,6 +23,7 @@
 
       framework = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
+        specialArgs = { inherit termfilechooser; };
         modules = [
           nixos-hardware.nixosModules.framework-12-13th-gen-intel
           ./hosts/framework/configuration.nix

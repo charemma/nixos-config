@@ -133,7 +133,8 @@
         "disko": "disko",
         "nixos-hardware": "nixos-hardware",
         "nixpkgs": "nixpkgs",
-        "raspberry-pi-nix": "raspberry-pi-nix"
+        "raspberry-pi-nix": "raspberry-pi-nix",
+        "termfilechooser": "termfilechooser"
       }
     },
     "rpi-bluez-firmware-src": {
@@ -252,6 +253,26 @@
         "owner": "raspberrypi",
         "ref": "v1.5.2",
         "repo": "rpicam-apps",
+        "type": "github"
+      }
+    },
+    "termfilechooser": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1773044680,
+        "narHash": "sha256-iSSpoibzV4uWXnXQJ4GnNIy0q2Lmruwrgkxk0f4feKs=",
+        "owner": "charemma",
+        "repo": "xdg-desktop-portal-termfilechooser",
+        "rev": "ddfe4ae6a7fe9c4fba92e8511b6a144d44b34bc6",
+        "type": "github"
+      },
+      "original": {
+        "owner": "charemma",
+        "repo": "xdg-desktop-portal-termfilechooser",
         "type": "github"
       }
     }

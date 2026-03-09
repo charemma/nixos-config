@@ -1,12 +1,14 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, termfilechooser, ... }:
 
-{
+let
+  termfilechooserPkg = termfilechooser.packages.${pkgs.system}.default;
+in {
   services.xserver = {
     enable = true;
     windowManager.i3.enable = true;
     xkb = {
       layout = "us,gr";
-      options = "grp:alt_shift_toggle";
+      options = "grp:alt_space_toggle";
     };
   };
 
@@ -20,7 +22,29 @@
   security.pam.services.sddm.enableGnomeKeyring = true;
   security.pam.services.i3lock.enable = true;
   xdg.portal.enable = true;
-  xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
+  xdg.portal.extraPortals = [
+    pkgs.xdg-desktop-portal-gtk
+    termfilechooserPkg
+  ];
+  xdg.portal.config.i3 = {
+    "org.freedesktop.impl.portal.FileChooser" = "termfilechooser";
+  };
+
+  environment.etc."xdg/xdg-desktop-portal-termfilechooser/config".text = ''
+    [filechooser]
+    cmd=${termfilechooserPkg}/share/xdg-desktop-portal-termfilechooser/yazi-wrapper.sh
+    default_dir=$HOME/Downloads
+  '';
+
+  services.printing = {
+    enable = true;
+    drivers = [ pkgs.gutenprint ];
+  };
+  services.avahi = {
+    enable = true;
+    nssmdns4 = true;
+    openFirewall = true;
+  };
 
   services.libinput = {
     enable = true;
@@ -40,6 +64,7 @@
     feh
     i3lock-color
     flameshot
+    xkb-switch-i3
     xclip
     fuzzel
     kitty
