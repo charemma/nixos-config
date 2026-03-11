@@ -21,6 +21,10 @@ deploy-vps:
 deploy-web:
     cat "$HOME/code/charemma-web/k8s/"*.yaml | ssh charemma@charemma.de "sudo kubectl apply -f -"
 
+# build rpi5 sd card image (requires binfmt on build host)
+build-rpi5:
+    nix build .#nixosConfigurations.rpi5.config.system.build.sdImage
+
 # show what would change
 dry host="north":
     nixos-rebuild dry-activate --flake "$(pwd)#{{host}}"
