@@ -38,11 +38,12 @@
         ];
       };
 
-      rpi5 = nixpkgs.lib.nixosSystem {
+      airsensor = nixpkgs.lib.nixosSystem {
         system = "aarch64-linux";
         modules = [
           raspberry-pi-nix.nixosModules.raspberry-pi
-          ./hosts/rpi5/configuration.nix
+          raspberry-pi-nix.nixosModules.sd-image
+          ./hosts/airsensor/configuration.nix
         ];
       };
     };

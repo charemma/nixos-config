@@ -1,11 +1,6 @@
 { config, lib, pkgs, ... }:
 
 {
-  imports = [
-    ../../modules/core.nix
-    ../../modules/remote-access.nix
-  ];
-
   raspberry-pi-nix.board = "bcm2712";
 
   fileSystems."/" = {
@@ -13,7 +8,7 @@
     fsType = "ext4";
   };
 
-  networking.hostName = "rpi5";
+  networking.hostName = "airsensor";
   networking.networkmanager.enable = true;
 
   time.timeZone = "Europe/Athens";
@@ -26,7 +21,6 @@
     uid = 1000;
     group = "charemma";
     extraGroups = [ "wheel" "networkmanager" ];
-    shell = pkgs.zsh;
     initialHashedPassword = "";
   };
 
@@ -35,7 +29,9 @@
     wheelNeedsPassword = false;
   };
 
-  programs.zsh.enable = true;
+  services.openssh.enable = true;
+
+  # TODO: import airsensor service module
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
