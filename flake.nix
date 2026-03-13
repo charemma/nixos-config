@@ -9,9 +9,11 @@
     raspberry-pi-nix.url = "github:nix-community/raspberry-pi-nix";
     termfilechooser.url = "github:charemma/xdg-desktop-portal-termfilechooser";
     termfilechooser.inputs.nixpkgs.follows = "nixpkgs";
+    airdata.url = "github:charemma/airdata";
+    airdata.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, disko, nixos-hardware, raspberry-pi-nix, termfilechooser, ... }: {
+  outputs = { self, nixpkgs, disko, nixos-hardware, raspberry-pi-nix, termfilechooser, airdata, ... }: {
     nixosConfigurations = {
       north = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
@@ -38,11 +40,21 @@
         ];
       };
 
+      gateway = nixpkgs.lib.nixosSystem {
+        system = "aarch64-linux";
+        modules = [
+          raspberry-pi-nix.nixosModules.raspberry-pi
+          raspberry-pi-nix.nixosModules.sd-image
+          ./hosts/gateway/configuration.nix
+        ];
+      };
+
       airsensor = nixpkgs.lib.nixosSystem {
         system = "aarch64-linux";
         modules = [
           raspberry-pi-nix.nixosModules.raspberry-pi
           raspberry-pi-nix.nixosModules.sd-image
+          airdata.nixosModules.default
           ./hosts/airsensor/configuration.nix
         ];
       };

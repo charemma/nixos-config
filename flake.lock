@@ -1,5 +1,25 @@
 {
   "nodes": {
+    "airdata": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1773393065,
+        "narHash": "sha256-uiKsC6X1Ia1tj+K2zy/Zf+9u6TUYW1uqdoEf7IgujgU=",
+        "owner": "charemma",
+        "repo": "airdata",
+        "rev": "aaf97233daca356a9c46c5455e3bf289e35d2f76",
+        "type": "github"
+      },
+      "original": {
+        "owner": "charemma",
+        "repo": "airdata",
+        "type": "github"
+      }
+    },
     "disko": {
       "inputs": {
         "nixpkgs": [
@@ -130,6 +150,7 @@
     },
     "root": {
       "inputs": {
+        "airdata": "airdata",
         "disko": "disko",
         "nixos-hardware": "nixos-hardware",
         "nixpkgs": "nixpkgs",
