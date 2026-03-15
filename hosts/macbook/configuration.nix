@@ -1,6 +1,10 @@
 { config, lib, pkgs, ... }:
 
 {
+  imports = [
+    ../../modules/dev.nix
+  ];
+
   networking.hostName = "macbook";
 
   time.timeZone = "Europe/Athens";
@@ -15,7 +19,6 @@
   # Security
   security.pam.services.sudo_local.touchIdAuth = true;
 
-  # System packages (user-level packages stay in nix-home)
   environment.systemPackages = with pkgs; [
     vim
   ];

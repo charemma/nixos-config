@@ -4,6 +4,7 @@
   imports = [
     ../../modules/core.nix
     ../../modules/remote-access.nix
+    ../../modules/binary-cache.nix
   ];
 
   raspberry-pi-nix.board = "bcm2712";

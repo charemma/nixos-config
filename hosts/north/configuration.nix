@@ -5,8 +5,10 @@
     [ ./hardware-configuration.nix
       ../../modules/desktop.nix
       ../../modules/core.nix
+      ../../modules/dev.nix
       ../../modules/remote-access.nix
       ../../modules/infosec.nix
+      ../../modules/binary-cache.nix
     ];
 
   boot.binfmt.emulatedSystems = [ "aarch64-linux" ];

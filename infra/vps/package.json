@@ -1,0 +1,11 @@
+{
+  "name": "vps",
+  "main": "index.ts",
+  "devDependencies": {
+    "@types/node": "^22"
+  },
+  "dependencies": {
+    "@pulumi/kubernetes": "^4",
+    "@pulumi/pulumi": "^3"
+  }
+}

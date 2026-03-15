@@ -1,0 +1,3 @@
+config:
+  vps:atticJwtSecret:
+    secure: AAABAPEs50MIxDGL93iJg5m7S/13q0ufcUyCMlcKRKtl+FeE7DdmK4sxKxSC2BON

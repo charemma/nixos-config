@@ -6,6 +6,8 @@
     ./disko-config.nix
     ../../modules/core.nix
     ../../modules/remote-access.nix
+    ../../modules/binary-cache.nix
+    ../../services/k3s
   ];
 
   boot.loader.systemd-boot.enable = true;
@@ -13,44 +15,14 @@
 
   networking.hostName = "vps";
   networking.useDHCP = true;
-  networking.firewall.allowedTCPPorts = [ 80 443 6443 ];
 
   time.timeZone = "Europe/Berlin";
   i18n.defaultLocale = "en_US.UTF-8";
 
-  # k3s lightweight kubernetes
-  services.k3s = {
+  services.k3s-server = {
     enable = true;
-    role = "server";
-    extraFlags = toString [
-      "--tls-san=charemma.de"
-    ];
-  };
-
-  # Traefik Let's Encrypt config via HelmChartConfig (k3s auto-deploy)
-  systemd.services.k3s-traefik-config = {
-    description = "Deploy Traefik HelmChartConfig for Let's Encrypt";
-    after = [ "k3s.service" ];
-    wantedBy = [ "multi-user.target" ];
-    serviceConfig = {
-      Type = "oneshot";
-      RemainAfterExit = true;
-    };
-    script = ''
-      cp ${pkgs.writeText "traefik-config.yaml" ''
-        apiVersion: helm.cattle.io/v1
-        kind: HelmChartConfig
-        metadata:
-          name: traefik
-          namespace: kube-system
-        spec:
-          valuesContent: |-
-            additionalArguments:
-              - "--certificatesresolvers.letsencrypt.acme.email=info@charemma.de"
-              - "--certificatesresolvers.letsencrypt.acme.storage=/data/acme.json"
-              - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
-      ''} /var/lib/rancher/k3s/server/manifests/traefik-config.yaml
-    '';
+    domain = "charemma.de";
+    acmeEmail = "me@charemma.de";
   };
 
   # User
@@ -76,7 +48,10 @@
   programs.bash.enable = true;
   programs.zsh.enable = true;
 
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  nix.settings = {
+    experimental-features = [ "nix-command" "flakes" ];
+    trusted-users = [ "charemma" ];
+  };
 
   system.stateVersion = "26.05";
 }

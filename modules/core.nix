@@ -9,12 +9,8 @@
   environment.systemPackages = with pkgs; [
     chezmoi
     curl
-    fastfetch
-    fzf
-    gh
     git
     htop
-    just
     starship
     tmux
     wget

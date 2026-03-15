@@ -1,8 +1,7 @@
 # nixos-config
 
-Declarative NixOS system configurations managed via flakes. Modular setup with
-per-host configs and shared modules -- from a build workstation to a portable
-pentest laptop to a headless VPS.
+Declarative system configurations managed via flakes. NixOS for Linux hosts,
+nix-darwin for macOS. Modular setup with per-host configs and shared modules.
 
 ## How it works
 
@@ -23,33 +22,51 @@ All actual configuration stays here, `nixos-rebuild` just follows the redirect.
 
 ## Hosts
 
-| Host | Arch | Purpose |
-|------|------|---------|
-| `north` | x86_64 | Build workstation -- full desktop (niri/i3), infosec tooling, sound, graphics |
-| `framework` | x86_64 | Framework Laptop 12 -- portable pentest machine, full desktop + infosec |
-| `vps` | x86_64 | VPS for charemma.de -- k3s with Traefik ingress, website served as container from ghcr.io |
-| `rpi5` | aarch64 | Headless Raspberry Pi 5 server -- SSH, core utils, no desktop |
+| Host | Arch | Platform | Purpose |
+|------|------|----------|---------|
+| `north` | x86_64 | NixOS | Build workstation -- full desktop (niri/i3), infosec tooling |
+| `macbook` | aarch64 | nix-darwin | MacBook -- dev machine |
+| `vps` | x86_64 | NixOS | VPS for charemma.de -- k3s with Traefik, attic binary cache |
+| `rpi5` | aarch64 | NixOS | Headless Raspberry Pi 5 server |
 
 ## Modules
 
 Shared modules under `modules/` that hosts import selectively:
 
-- **core.nix** -- base packages (git, neovim, tmux, just, htop, etc.) and shell setup
-- **desktop.nix** -- display/WM (niri + i3 fallback via lightdm), GUI apps (brave, kitty, waybar), input config
-- **remote-access.nix** -- SSH + xRDP with niri session, firewall port 3389
-- **infosec.nix** -- security/pentest tooling: recon (nmap, ffuf, gobuster), exploitation (metasploit, hashcat, hydra, sqlmap), web (burpsuite, httpie), networking (proxychains, socat)
-- **laptop.nix** -- power management (TLP), backlight control, lid switch behavior, battery thresholds, touchpad config
+- **core.nix** -- base packages (git, tmux, htop, etc.) and shell setup
+- **dev.nix** -- dev tools (neovim, fzf, ripgrep, claude-code, kubectl, etc.)
+- **desktop.nix** -- display/WM (niri + i3 fallback), GUI apps
+- **remote-access.nix** -- SSH + xRDP
+- **infosec.nix** -- security/pentest tooling
+- **laptop.nix** -- power management, touchpad
+- **binary-cache.nix** -- nix.charemma.de substituter config
+
+## Services
+
+Self-contained NixOS modules under `services/`:
+
+- **k3s/** -- single-node k3s with Traefik and Let's Encrypt
+
+## Infrastructure
+
+Pulumi project under `infra/vps/` manages k8s workloads on the VPS:
+
+- Attic binary cache (namespace, deployment, PVC, secrets, ingress)
 
 ## Usage
 
 Everything goes through the justfile:
 
 ```
-just rebuild [host]       rebuild and switch to new configuration
+just rebuild [host]       rebuild and switch (NixOS)
+just rebuild-mac          rebuild and switch (nix-darwin)
 just boot [host]          rebuild, activate on next boot
 just test [host]          test config (rollback on next boot)
 just deploy-vps           deploy vps config to charemma.de
 just deploy-web           apply k8s manifests to the vps
+just build-rpi5           build rpi5 sd card image
+just push [cache]         push build result to binary cache
+just push-system [host]   push full system closure to cache
 just dry [host]           show what would change
 just diff                 diff current vs new generation (nvd)
 just update               update flake inputs
@@ -69,6 +86,25 @@ git clone git@github.com:charemma/nixos-config.git ~/code/nixos-config
 
 This writes the redirect flake to `/etc/nixos/` and runs the initial rebuild.
 
+### Attic binary cache
+
+After deploying the VPS and running `pulumi up` for the first time, bootstrap
+the attic cache:
+
+```bash
+# generate admin token
+kubectl -n attic exec deploy/attic -- /bin/atticadm make-token \
+  -f /etc/attic/server.toml \
+  --sub admin --validity "10y" \
+  --push "*" --pull "*" --create-cache "*" \
+  --configure-cache "*" --configure-cache-retention "*" --destroy-cache "*"
+
+# configure local client
+attic login charemma https://nix.charemma.de <token>
+attic cache create main
+attic cache configure main --public
+```
+
 ## Building the RPi5 image
 
 The rpi5 configuration targets aarch64-linux. To build an SD card image from an
@@ -82,12 +118,12 @@ boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
 Then build the image:
 
 ```
-nix build .#nixosConfigurations.rpi5.config.system.build.sdImage
+just build-rpi5
 ```
 
 Flash the resulting image to an SD card with `dd` or your tool of choice.
 
 ## Related
 
-- [nix-home](https://github.com/charemma/nix-home) -- user-level packages via home-manager, works cross-platform (Linux, macOS, WSL) so dev tools stay independent of the OS
+- [nix-home](https://github.com/charemma/nix-home) -- user-level packages via home-manager (Linux hosts)
 - [dotfiles](https://github.com/charemma/dotfiles) -- config files managed via chezmoi

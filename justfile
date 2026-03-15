@@ -29,6 +29,14 @@ deploy-web:
 build-rpi5:
     nix build .#nixosConfigurations.rpi5.config.system.build.sdImage
 
+# push latest build result to binary cache
+push cache="main":
+    attic push {{cache}} ./result
+
+# push full system closure to binary cache
+push-system host="north" cache="main":
+    nix build ".#nixosConfigurations.{{host}}.config.system.build.toplevel" --no-link --print-out-paths | xargs attic push {{cache}}
+
 # show what would change
 dry host="north":
     nixos-rebuild dry-activate --flake "$(pwd)#{{host}}"
