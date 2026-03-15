@@ -1,9 +1,13 @@
 _default:
     @just --list
 
-# rebuild and switch to new configuration
+# rebuild and switch to new NixOS configuration
 rebuild host="north":
     sudo nixos-rebuild switch --flake "$(pwd)#{{host}}"
+
+# rebuild and switch macbook (nix-darwin)
+rebuild-mac:
+    sudo darwin-rebuild switch --flake "$(pwd)#macbook"
 
 # rebuild but only activate on next boot
 boot host="north":

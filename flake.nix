@@ -1,8 +1,12 @@
 {
-  description = "NixOS configurations";
+  description = "System configurations";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nix-darwin = {
+      url = "github:LnL7/nix-darwin";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     disko.url = "github:nix-community/disko";
     disko.inputs.nixpkgs.follows = "nixpkgs";
     nixos-hardware.url = "github:NixOS/nixos-hardware";
@@ -11,22 +15,22 @@
     termfilechooser.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, disko, nixos-hardware, raspberry-pi-nix, termfilechooser, ... }: {
+  outputs = { self, nixpkgs, nix-darwin, disko, nixos-hardware, raspberry-pi-nix, termfilechooser, ... }: {
+    darwinConfigurations = {
+      macbook = nix-darwin.lib.darwinSystem {
+        system = "aarch64-darwin";
+        modules = [
+          ./hosts/macbook/configuration.nix
+        ];
+      };
+    };
+
     nixosConfigurations = {
       north = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         specialArgs = { inherit termfilechooser; };
         modules = [
           ./hosts/north/configuration.nix
-        ];
-      };
-
-      framework = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
-        specialArgs = { inherit termfilechooser; };
-        modules = [
-          nixos-hardware.nixosModules.framework-12-13th-gen-intel
-          ./hosts/framework/configuration.nix
         ];
       };
 
