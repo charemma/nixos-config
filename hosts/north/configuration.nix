@@ -9,6 +9,7 @@
       ../../modules/remote-access.nix
       ../../modules/infosec.nix
       ../../modules/binary-cache.nix
+      ../../modules/vm-bridge.nix
     ];
 
   boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
@@ -52,6 +53,7 @@
   hardware.graphics.enable = true;
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  nix.settings.trusted-users = [ "charemma" ];
   nixpkgs.config.allowUnfree = true;
 
   system.stateVersion = "26.05";
