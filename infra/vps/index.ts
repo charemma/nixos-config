@@ -120,6 +120,8 @@ new k8s.networking.v1.Ingress("attic", {
     annotations: {
       "traefik.ingress.kubernetes.io/router.entrypoints": "websecure",
       "traefik.ingress.kubernetes.io/router.tls.certresolver": "letsencrypt",
+      "traefik.ingress.kubernetes.io/buffering-maxrequestbodybytes": "0",
+      "traefik.ingress.kubernetes.io/buffering-maxresponsebodybytes": "0",
     },
   },
   spec: {

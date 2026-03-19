@@ -4,6 +4,7 @@ _default:
 # rebuild and switch to new NixOS configuration
 rebuild host="north":
     sudo nixos-rebuild switch --flake "$(pwd)#{{host}}"
+    sudo systemctl restart nix-daemon
 
 # rebuild and switch macbook (nix-darwin)
 rebuild-mac:
