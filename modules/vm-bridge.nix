@@ -11,4 +11,6 @@
   environment.etc."qemu/bridge.conf".text = ''
     allow br0
   '';
+
+  environment.shellAliases.arp-scan = "sudo arp-scan -I br0 -l";
 }

@@ -39,6 +39,7 @@ in {
   services.printing = {
     enable = true;
     drivers = [ pkgs.gutenprint ];
+    extraConf = "ErrorPolicy retry-job";
   };
   services.avahi = {
     enable = true;
@@ -72,6 +73,7 @@ in {
     obsidian
     typora
     telegram-desktop
+    caffeine-ng
     pavucontrol
     pulseaudio
     (polybar.override { pulseSupport = true; })
