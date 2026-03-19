@@ -24,6 +24,7 @@
 
   environment.systemPackages = with pkgs; [
     vim
+    qemu
   ];
 
   system.stateVersion = 6;
