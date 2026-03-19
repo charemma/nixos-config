@@ -2,6 +2,7 @@
 
 {
   imports = [
+    ../../modules/core.nix
     ../../modules/dev.nix
   ];
 
@@ -23,7 +24,6 @@
   security.pam.services.sudo_local.touchIdAuth = true;
 
   environment.systemPackages = with pkgs; [
-    vim
     qemu
   ];
 

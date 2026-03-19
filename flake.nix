@@ -13,9 +13,11 @@
     raspberry-pi-nix.url = "github:nix-community/raspberry-pi-nix";
     termfilechooser.url = "github:charemma/xdg-desktop-portal-termfilechooser";
     termfilechooser.inputs.nixpkgs.follows = "nixpkgs";
+    anker.url = "github:charemma/anker";
+    anker.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, nix-darwin, disko, nixos-hardware, raspberry-pi-nix, termfilechooser, ... }:
+  outputs = { self, nixpkgs, nix-darwin, disko, nixos-hardware, raspberry-pi-nix, termfilechooser, anker, ... }:
   let
     forAllSystems = nixpkgs.lib.genAttrs [ "x86_64-linux" "aarch64-linux" "aarch64-darwin" ];
   in {
@@ -34,6 +36,7 @@
     darwinConfigurations = {
       macbook = nix-darwin.lib.darwinSystem {
         system = "aarch64-darwin";
+        specialArgs = { inherit anker; };
         modules = [
           ./hosts/macbook/configuration.nix
         ];
@@ -43,7 +46,7 @@
     nixosConfigurations = {
       north = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
-        specialArgs = { inherit termfilechooser; };
+        specialArgs = { inherit termfilechooser anker; };
         modules = [
           ./hosts/north/configuration.nix
         ];

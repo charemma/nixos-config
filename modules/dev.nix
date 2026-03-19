@@ -1,7 +1,8 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, anker, ... }:
 
 {
   environment.systemPackages = with pkgs; [
+    anker.packages.${pkgs.system}.default
     attic-client
     bat
     claude-code
