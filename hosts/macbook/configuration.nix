@@ -16,6 +16,9 @@
   };
   nixpkgs.config.allowUnfree = true;
 
+  # Linux builder VM for cross-platform Nix builds (x86_64-linux, aarch64-linux)
+  nix.linux-builder.enable = true;
+
   # Security
   security.pam.services.sudo_local.touchIdAuth = true;
 
