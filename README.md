@@ -49,31 +49,30 @@ Self-contained NixOS modules under `services/`:
 
 ## Infrastructure
 
-Pulumi project under `infra/vps/` manages k8s workloads on the VPS:
+Pulumi project under `infra/vps/` (stack `prod` on Pulumi Cloud) manages k8s workloads on the VPS:
 
-- Attic binary cache (namespace, deployment, PVC, secrets, ingress)
+- **Attic** binary cache (namespace, deployment, PVC, secrets, ingress at `nix.charemma.de`)
+- **ArgoCD** GitOps controller (ingress at `argocd.charemma.de`)
+
+ArgoCD manages the rest via the App-of-Apps pattern, syncing from `infra/vps/apps/`:
+
+- **kube-prometheus-stack** -- Prometheus + Grafana (ingress at `grafana.charemma.de`)
 
 ## Usage
 
 Everything goes through the justfile:
 
 ```
-just rebuild [host]       rebuild and switch (NixOS)
-just rebuild-mac          rebuild and switch (nix-darwin)
-just boot [host]          rebuild, activate on next boot
-just test [host]          test config (rollback on next boot)
-just deploy-vps           deploy vps config to charemma.de
-just deploy-web           apply k8s manifests to the vps
-just build-rpi5           build rpi5 sd card image
-just push [cache]         push build result to binary cache
-just push-system [host]   push full system closure to cache
-just dry [host]           show what would change
-just diff                 diff current vs new generation (nvd)
-just update               update flake inputs
-just gc                   garbage collect old generations
+just switch [host]         rebuild and switch (auto-detects darwin/nixos)
+just deploy                deploy vps NixOS config to charemma.de
+just build-rpi5            build rpi5 sd card image
+just push [cache]          push build result to binary cache
+just push-system [host]    push full system closure to cache
+just infra-up              deploy k8s workloads via Pulumi (attic + argocd)
+just infra-preview         preview Pulumi changes
+just update                update flake inputs
+just gc                    garbage collect old generations
 ```
-
-Host defaults to `north` if omitted.
 
 ## Bootstrap
 
@@ -103,6 +102,28 @@ kubectl -n attic exec deploy/attic -- /bin/atticadm make-token \
 attic login charemma https://nix.charemma.de <token>
 attic cache create main
 attic cache configure main --public
+```
+
+### ArgoCD
+
+After `just infra-up`, add DNS records for `argocd.charemma.de` and `grafana.charemma.de`
+pointing to the VPS IP.
+
+Get the initial admin password:
+
+```bash
+kubectl -n argocd get secret argocd-initial-admin-secret \
+  -o jsonpath='{.data.password}' | base64 -d
+```
+
+Log in at `https://argocd.charemma.de` (user: `admin`). ArgoCD will automatically
+sync `infra/vps/apps/` from this repo, deploying kube-prometheus-stack.
+
+Get the initial Grafana password:
+
+```bash
+kubectl get secret -n monitoring kube-prometheus-stack-grafana \
+  -o jsonpath='{.data.admin-password}' | base64 -d
 ```
 
 ## Building the RPi5 image
