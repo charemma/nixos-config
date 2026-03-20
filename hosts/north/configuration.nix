@@ -10,7 +10,10 @@
       ../../modules/infosec.nix
       ../../modules/binary-cache.nix
       ../../modules/vm-bridge.nix
+      ../../modules/users.nix
     ];
+
+  charemma.extraGroups = [ "networkmanager" "video" "audio" ];
 
   boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
 
@@ -29,22 +32,6 @@
     enable = true;
     alsa.enable = true;
     pulse.enable = true;
-  };
-
-  # User
-  users.groups.charemma.gid = 1000;
-  users.users.charemma = {
-    isNormalUser = true;
-    uid = 1000;
-    group = "charemma";
-    extraGroups = [ "wheel" "networkmanager" "video" "audio" ];
-    shell = pkgs.zsh;
-    initialHashedPassword = "";
-  };
-
-  security.sudo = {
-    enable = true;
-    wheelNeedsPassword = false;
   };
 
   programs.zsh.enable = true;
