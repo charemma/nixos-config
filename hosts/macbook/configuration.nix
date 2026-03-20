@@ -4,6 +4,7 @@
   imports = [
     ../../modules/core.nix
     ../../modules/dev.nix
+    ../../modules/binary-cache.nix
   ];
 
   networking.hostName = "macbook";

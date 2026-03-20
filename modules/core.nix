@@ -2,7 +2,7 @@
 
 {
   programs.vim.enable = true;
-  environment.sessionVariables.EDITOR = lib.mkDefault "vim";
+  environment.variables.EDITOR = lib.mkDefault "vim";
 
   programs.zsh.enable = true;
 
