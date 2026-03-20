@@ -5,7 +5,10 @@
     ../../modules/core.nix
     ../../modules/remote-access.nix
     ../../modules/binary-cache.nix
+    ../../modules/users.nix
   ];
+
+  charemma.extraGroups = [ "networkmanager" ];
 
   raspberry-pi-nix.board = "bcm2712";
 
@@ -19,22 +22,6 @@
 
   time.timeZone = "Europe/Athens";
   i18n.defaultLocale = "en_US.UTF-8";
-
-  # User
-  users.groups.charemma.gid = 1000;
-  users.users.charemma = {
-    isNormalUser = true;
-    uid = 1000;
-    group = "charemma";
-    extraGroups = [ "wheel" "networkmanager" ];
-    shell = pkgs.zsh;
-    initialHashedPassword = "";
-  };
-
-  security.sudo = {
-    enable = true;
-    wheelNeedsPassword = false;
-  };
 
   programs.zsh.enable = true;
 
