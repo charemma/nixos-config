@@ -1,3 +1,0 @@
-name: vps
-runtime: nodejs
-description: k8s workloads on charemma.de (k3s)

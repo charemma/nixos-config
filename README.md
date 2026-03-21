@@ -49,14 +49,8 @@ Self-contained NixOS modules under `services/`:
 
 ## Infrastructure
 
-Pulumi project under `infra/vps/` (stack `prod` on Pulumi Cloud) manages k8s workloads on the VPS:
-
-- **Attic** binary cache (namespace, deployment, PVC, secrets, ingress at `nix.charemma.de`)
-- **ArgoCD** GitOps controller (ingress at `argocd.charemma.de`)
-
-ArgoCD manages the rest via the App-of-Apps pattern, syncing from `infra/vps/apps/`:
-
-- **kube-prometheus-stack** -- Prometheus + Grafana (ingress at `grafana.charemma.de`)
+k8s workloads (ArgoCD, attic, Prometheus/Grafana) are managed in the
+[infra](https://github.com/charemma/infra) repo via Pulumi and GitOps.
 
 ## Usage
 
@@ -68,8 +62,6 @@ just deploy                deploy vps NixOS config to charemma.de
 just build-rpi5            build rpi5 sd card image
 just push [cache]          push build result to binary cache
 just push-system [host]    push full system closure to cache
-just infra-up              deploy k8s workloads via Pulumi (attic + argocd)
-just infra-preview         preview Pulumi changes
 just update                update flake inputs
 just gc                    garbage collect old generations
 ```
@@ -87,44 +79,7 @@ This writes the redirect flake to `/etc/nixos/` and runs the initial rebuild.
 
 ### Attic binary cache
 
-After deploying the VPS and running `pulumi up` for the first time, bootstrap
-the attic cache:
-
-```bash
-# generate admin token
-kubectl -n attic exec deploy/attic -- /bin/atticadm make-token \
-  -f /etc/attic/server.toml \
-  --sub admin --validity "10y" \
-  --push "*" --pull "*" --create-cache "*" \
-  --configure-cache "*" --configure-cache-retention "*" --destroy-cache "*"
-
-# configure local client
-attic login charemma https://nix.charemma.de <token>
-attic cache create main
-attic cache configure main --public
-```
-
-### ArgoCD
-
-After `just infra-up`, add DNS records for `argocd.charemma.de` and `grafana.charemma.de`
-pointing to the VPS IP.
-
-Get the initial admin password:
-
-```bash
-kubectl -n argocd get secret argocd-initial-admin-secret \
-  -o jsonpath='{.data.password}' | base64 -d
-```
-
-Log in at `https://argocd.charemma.de` (user: `admin`). ArgoCD will automatically
-sync `infra/vps/apps/` from this repo, deploying kube-prometheus-stack.
-
-Get the initial Grafana password:
-
-```bash
-kubectl get secret -n monitoring kube-prometheus-stack-grafana \
-  -o jsonpath='{.data.admin-password}' | base64 -d
-```
+See [infra](https://github.com/charemma/infra) for bootstrap instructions.
 
 ## Building the RPi5 image
 

@@ -1,5 +1,3 @@
-mod infra 'infra/vps/justfile'
-
 _default:
     @just --list
 
