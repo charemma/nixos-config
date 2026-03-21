@@ -1,3 +1,4 @@
+# infosec.nix -- penetration testing and security research tools (north only)
 { config, lib, pkgs, ... }:
 
 {
