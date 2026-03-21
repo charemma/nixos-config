@@ -158,6 +158,7 @@ const argoCDNs = new k8s.core.v1.Namespace("argocd", {
 });
 
 const argoCD = new k8s.helm.v3.Release("argocd", {
+  name: "argocd",
   chart: "argo-cd",
   repositoryOpts: { repo: "https://argoproj.github.io/argo-helm" },
   namespace: argoCDNs.metadata.name,

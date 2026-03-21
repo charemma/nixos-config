@@ -1,3 +1,5 @@
+mod infra 'infra/vps/justfile'
+
 _default:
     @just --list
 
@@ -27,14 +29,6 @@ push cache="main":
 # push full system closure to binary cache
 push-system host="north" cache="main":
     nix build ".#nixosConfigurations.{{host}}.config.system.build.toplevel" --no-link --print-out-paths | xargs attic push {{cache}}
-
-# deploy k8s workloads via Pulumi
-infra-up:
-    cd infra/vps && pulumi up --stack prod
-
-# preview Pulumi changes
-infra-preview:
-    cd infra/vps && pulumi preview --stack prod
 
 # update flake inputs
 update:

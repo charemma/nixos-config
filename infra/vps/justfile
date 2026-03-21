@@ -1,0 +1,12 @@
+set fallback := true
+
+_default:
+    @just --list
+
+# deploy k8s workloads via Pulumi
+up:
+    pulumi up --stack prod
+
+# preview Pulumi changes
+preview:
+    pulumi preview --stack prod
