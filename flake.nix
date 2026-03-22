@@ -15,9 +15,11 @@
     termfilechooser.inputs.nixpkgs.follows = "nixpkgs";
     anker.url = "github:charemma/anker";
     anker.inputs.nixpkgs.follows = "nixpkgs";
+    nix-openclaw.url = "github:openclaw/nix-openclaw";
+    nix-openclaw.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, nix-darwin, disko, nixos-hardware, raspberry-pi-nix, termfilechooser, anker, ... }:
+  outputs = { self, nixpkgs, nix-darwin, disko, nixos-hardware, raspberry-pi-nix, termfilechooser, anker, nix-openclaw, ... }:
   let
     forAllSystems = nixpkgs.lib.genAttrs [ "x86_64-linux" "aarch64-linux" "aarch64-darwin" ];
   in {
@@ -65,6 +67,16 @@
         modules = [
           raspberry-pi-nix.nixosModules.raspberry-pi
           ./hosts/rpi5/configuration.nix
+        ];
+      };
+
+      aiagent = nixpkgs.lib.nixosSystem {
+        system = "aarch64-linux";
+        modules = [
+          raspberry-pi-nix.nixosModules.raspberry-pi
+          nix-openclaw.nixosModules.openclaw-gateway
+          { nixpkgs.overlays = [ nix-openclaw.overlays.default ]; }
+          ./hosts/aiagent/configuration.nix
         ];
       };
     };
