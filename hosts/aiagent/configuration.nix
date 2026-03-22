@@ -3,7 +3,6 @@
 {
   imports = [
     ../../modules/core.nix
-    ../../modules/remote-access.nix
     ../../modules/binary-cache.nix
   ];
 
