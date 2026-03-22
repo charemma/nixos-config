@@ -10,7 +10,6 @@
   # and evaluates them together -- order does not matter.
   imports = [
     ../../modules/core.nix
-    ../../modules/remote-access.nix
     ../../modules/binary-cache.nix
     ../../modules/users.nix
   ];
