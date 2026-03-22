@@ -20,6 +20,10 @@ deploy:
 build-rpi5:
     nix build .#nixosConfigurations.rpi5.config.system.build.sdImage
 
+# build aiagent sd card image (requires binfmt on build host)
+build-aiagent:
+    nix build .#nixosConfigurations.aiagent.config.system.build.sdImage
+
 # push latest build result to binary cache
 push cache="main":
     attic push {{cache}} ./result

@@ -30,11 +30,13 @@
     # Workday recap CLI tool (personal project).
     anker.url = "github:charemma/anker";
     anker.inputs.nixpkgs.follows = "nixpkgs";
+    nix-openclaw.url = "github:openclaw/nix-openclaw";
+    nix-openclaw.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   # outputs is a function that receives all inputs and returns an attribute set.
   # The `self` argument refers to this flake itself (useful for referencing its own outputs).
-  outputs = { self, nixpkgs, nix-darwin, disko, nixos-hardware, raspberry-pi-nix, termfilechooser, anker, ... }:
+  outputs = { self, nixpkgs, nix-darwin, disko, nixos-hardware, raspberry-pi-nix, termfilechooser, anker, nix-openclaw, ... }:
   let
     # Helper to produce one attribute per supported system without repeating the list.
     # Used for devShells which need to work on all platforms.
@@ -94,6 +96,16 @@
           # Provides the raspberry-pi-nix.board option and all RPi-specific config.
           raspberry-pi-nix.nixosModules.raspberry-pi
           ./hosts/rpi5/configuration.nix
+        ];
+      };
+
+      aiagent = nixpkgs.lib.nixosSystem {
+        system = "aarch64-linux";
+        modules = [
+          raspberry-pi-nix.nixosModules.raspberry-pi
+          nix-openclaw.nixosModules.openclaw-gateway
+          { nixpkgs.overlays = [ nix-openclaw.overlays.default ]; }
+          ./hosts/aiagent/configuration.nix
         ];
       };
     };
