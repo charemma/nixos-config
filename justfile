@@ -16,13 +16,17 @@ switch host="":
 deploy:
     nix shell 'nixpkgs#nixos-rebuild' -c nixos-rebuild switch --flake "$(pwd)#vps" --target-host charemma@charemma.de --build-host charemma@charemma.de --sudo
 
-# build rpi5 sd card image (requires binfmt on build host)
+# build rpi5 sd card image -- set NIX_BUILDERS via eval $(just builder::env) first
 build-rpi5:
-    nix build .#nixosConfigurations.rpi5.config.system.build.sdImage
+    nix build .#nixosConfigurations.rpi5.config.system.build.sdImage --builders "$(just _builders)"
 
-# build aiagent sd card image (requires binfmt on build host)
+# build aiagent sd card image -- set NIX_BUILDERS via eval $(just builder::env) first
 build-aiagent:
-    nix build .#nixosConfigurations.aiagent.config.system.build.sdImage
+    nix build .#nixosConfigurations.aiagent.config.system.build.sdImage --builders "$(just _builders)"
+
+# internal: use NIX_BUILDERS if set, otherwise fall back to local linux-builder
+_builders:
+    @echo "${NIX_BUILDERS:-ssh://linux-builder aarch64-linux /etc/nix/builder_ed25519 4 1 - - -}"
 
 # push latest build result to binary cache
 push cache="main":
