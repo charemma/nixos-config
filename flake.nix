@@ -10,7 +10,11 @@
     disko.url = "github:nix-community/disko";
     disko.inputs.nixpkgs.follows = "nixpkgs";
     nixos-hardware.url = "github:NixOS/nixos-hardware";
+    # pinned to a nixpkgs rev compatible with raspberry-pi-nix
+    # newer nixpkgs-unstable introduced images.nix which conflicts with rpi-nix's extlinux bootloader
+    nixpkgs-rpi.url = "github:NixOS/nixpkgs/cbd8ec4de4469333c82ff40d057350c30e9f7d36";
     raspberry-pi-nix.url = "github:nix-community/raspberry-pi-nix";
+    raspberry-pi-nix.inputs.nixpkgs.follows = "nixpkgs-rpi";
     termfilechooser.url = "github:charemma/xdg-desktop-portal-termfilechooser";
     termfilechooser.inputs.nixpkgs.follows = "nixpkgs";
     anker.url = "github:charemma/anker";
@@ -19,9 +23,11 @@
     nix-openclaw.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, nix-darwin, disko, nixos-hardware, raspberry-pi-nix, termfilechooser, anker, nix-openclaw, ... }:
+  outputs = { self, nixpkgs, nixpkgs-rpi, nix-darwin, disko, nixos-hardware, raspberry-pi-nix, termfilechooser, anker, nix-openclaw, ... }:
   let
     forAllSystems = nixpkgs.lib.genAttrs [ "x86_64-linux" "aarch64-linux" "aarch64-darwin" ];
+    # openclaw-gateway built with current nixpkgs (needs fetchPnpmDeps, not in nixpkgs-rpi)
+    openclawGateway = (nixpkgs.legacyPackages.aarch64-linux.extend nix-openclaw.overlays.default).openclaw-gateway;
   in {
     devShells = forAllSystems (system: let
       pkgs = nixpkgs.legacyPackages.${system};
@@ -62,20 +68,23 @@
         ];
       };
 
-      rpi5 = nixpkgs.lib.nixosSystem {
+      rpi5 = nixpkgs-rpi.lib.nixosSystem {
         system = "aarch64-linux";
         modules = [
           raspberry-pi-nix.nixosModules.raspberry-pi
+          raspberry-pi-nix.nixosModules.sd-image
           ./hosts/rpi5/configuration.nix
         ];
       };
 
-      aiagent = nixpkgs.lib.nixosSystem {
+      aiagent = nixpkgs-rpi.lib.nixosSystem {
         system = "aarch64-linux";
         modules = [
           raspberry-pi-nix.nixosModules.raspberry-pi
+          raspberry-pi-nix.nixosModules.sd-image
           nix-openclaw.nixosModules.openclaw-gateway
-          { nixpkgs.overlays = [ nix-openclaw.overlays.default ]; }
+          # use openclaw built with current nixpkgs -- nixpkgs-rpi is too old for fetchPnpmDeps
+          { services.openclaw-gateway.package = openclawGateway; }
           ./hosts/aiagent/configuration.nix
         ];
       };
