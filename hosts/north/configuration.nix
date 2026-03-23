@@ -11,7 +11,7 @@
       ../../modules/desktop.nix
       ../../modules/core.nix
       ../../modules/dev.nix
-      ../../modules/remote-access.nix
+      ../../modules/remote-desktop.nix
       ../../modules/infosec.nix
       ../../modules/binary-cache.nix
       # Creates a network bridge for QEMU VMs (see module for details).

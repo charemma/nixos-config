@@ -6,6 +6,8 @@
 { config, lib, pkgs, ... }:
 
 {
+  services.openssh.enable = true;
+
   programs.vim.enable = true;
 
   # lib.mkDefault sets a value that other modules can still override with a plain assignment.

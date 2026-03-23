@@ -11,7 +11,6 @@
     # Declarative disk partitioning via disko (used during nixos-anywhere install).
     ./disko-config.nix
     ../../modules/core.nix
-    ../../modules/remote-access.nix
     ../../modules/binary-cache.nix
     ../../modules/users.nix
     # Custom NixOS service module for k3s + Traefik + cert-manager.
