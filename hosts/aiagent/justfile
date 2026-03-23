@@ -1,8 +1,19 @@
 set fallback := true
 
+_root := `git rev-parse --show-toplevel`
+
 _default:
     @just --list
 
 # build sd card image
 build:
-    nix build "$(git rev-parse --show-toplevel)#nixosConfigurations.aiagent.config.system.build.sdImage" --builders "$(just _builders)"
+    nix build -o "{{ _root }}/results/aiagent" "{{ _root }}#nixosConfigurations.aiagent.config.system.build.sdImage" --builders "$(just _builders)"
+
+# flash sd card image to device (usage: just aiagent::flash /dev/sdX)
+flash device:
+    zstdcat {{ _root }}/results/aiagent/sd-image/*.img.zst | sudo dd of={{ device }} bs=4M status=progress
+    sync
+
+# push build closure to binary cache
+push cache="main":
+    nix path-info -r "{{ _root }}/results/aiagent" | xargs attic push {{ cache }}

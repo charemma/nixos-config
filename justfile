@@ -11,9 +11,14 @@ mod aiagent 'hosts/aiagent/justfile'
 _builders:
     @echo "${NIX_BUILDERS:-ssh-ng://linux-builder aarch64-linux /etc/nix/builder_ed25519 4 1 - - -}"
 
-# push latest build result to binary cache
+# push all build results to binary cache
 push cache="main":
-    attic push {{cache}} ./result
+    #!/usr/bin/env bash
+    for dir in results/*/; do
+        host=$(basename "$dir")
+        echo "Publishing $host..."
+        nix path-info -r "results/$host" | xargs attic push {{cache}}
+    done
 
 # push full system closure to binary cache
 push-system host="north" cache="main":
