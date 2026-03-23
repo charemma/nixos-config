@@ -104,6 +104,10 @@
 
       aiagent = nixpkgs-rpi.lib.nixosSystem {
         system = "aarch64-linux";
+        specialArgs = {
+          # nodejs from current nixpkgs (nixpkgs-rpi has v22.10, openclaw needs >=22.12)
+          nodejs-current = nixpkgs.legacyPackages.aarch64-linux.nodejs_22;
+        };
         modules = [
           raspberry-pi-nix.nixosModules.raspberry-pi
           raspberry-pi-nix.nixosModules.sd-image
