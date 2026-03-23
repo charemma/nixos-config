@@ -5,7 +5,6 @@
     (modulesPath + "/profiles/qemu-guest.nix")
     ./disko-config.nix
     ../../modules/core.nix
-    ../../modules/remote-access.nix
     ../../modules/binary-cache.nix
     ../../services/k3s
   ];
