@@ -54,6 +54,9 @@
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
   nix.settings.trusted-users = [ "charemma" ];
+  # Let remote builders pull dependencies from their own substituters (e.g. attic cache)
+  # instead of having nix copy everything over SSH.
+  nix.settings.builders-use-substitutes = true;
   nixpkgs.config.allowUnfree = true;
 
   system.stateVersion = "26.05";

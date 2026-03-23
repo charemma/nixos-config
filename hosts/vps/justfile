@@ -1,0 +1,8 @@
+set fallback := true
+
+_default:
+    @just --list
+
+# deploy vps config to charemma.de (builds remotely)
+deploy:
+    nix shell 'nixpkgs#nixos-rebuild' -c nixos-rebuild switch --flake "$(git rev-parse --show-toplevel)#vps" --target-host charemma@charemma.de --build-host charemma@charemma.de --sudo

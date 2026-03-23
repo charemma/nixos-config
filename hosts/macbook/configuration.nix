@@ -15,6 +15,7 @@
   nix.settings = {
     experimental-features = [ "nix-command" "flakes" ];
     trusted-users = [ "charemma" ];
+    builders-use-substitutes = true;
   };
   nixpkgs.config.allowUnfree = true;
 

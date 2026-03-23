@@ -2,3 +2,4 @@ result
 results/
 .direnv/
 .env
+node_modules/
