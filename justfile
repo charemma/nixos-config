@@ -1,32 +1,15 @@
 _default:
-    @just --list
+    @just --list --list-submodules
 
-# rebuild and switch (auto-detects darwin/nixos)
-switch host="":
-    #!/usr/bin/env bash
-    if [[ "$(uname)" == "Darwin" ]]; then
-        sudo darwin-rebuild switch --flake "$(pwd)#macbook"
-    else
-        host="${1:-$(hostname)}"
-        sudo nixos-rebuild switch --flake "$(pwd)#${host}"
-        sudo systemctl restart nix-daemon
-    fi
-
-# deploy vps config to charemma.de (builds remotely)
-deploy:
-    nix shell 'nixpkgs#nixos-rebuild' -c nixos-rebuild switch --flake "$(pwd)#vps" --target-host charemma@charemma.de --build-host charemma@charemma.de --sudo
-
-# build rpi5 sd card image -- set NIX_BUILDERS via eval $(just builder::env) first
-build-rpi5:
-    nix build .#nixosConfigurations.rpi5.config.system.build.sdImage --builders "$(just _builders)"
-
-# build aiagent sd card image -- set NIX_BUILDERS via eval $(just builder::env) first
-build-aiagent:
-    nix build .#nixosConfigurations.aiagent.config.system.build.sdImage --builders "$(just _builders)"
+mod north 'hosts/north/justfile'
+mod mac 'hosts/macbook/justfile'
+mod vps 'hosts/vps/justfile'
+mod rpi5 'hosts/rpi5/justfile'
+mod aiagent 'hosts/aiagent/justfile'
 
 # internal: use NIX_BUILDERS if set, otherwise fall back to local linux-builder
 _builders:
-    @echo "${NIX_BUILDERS:-ssh://linux-builder aarch64-linux /etc/nix/builder_ed25519 4 1 - - -}"
+    @echo "${NIX_BUILDERS:-ssh-ng://linux-builder aarch64-linux /etc/nix/builder_ed25519 4 1 - - -}"
 
 # push latest build result to binary cache
 push cache="main":

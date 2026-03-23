@@ -1,0 +1,8 @@
+set fallback := true
+
+_default:
+    @just --list
+
+# rebuild and switch nix-darwin configuration
+rebuild:
+    sudo darwin-rebuild switch --flake "$(git rev-parse --show-toplevel)#macbook"

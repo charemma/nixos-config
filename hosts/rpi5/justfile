@@ -1,0 +1,8 @@
+set fallback := true
+
+_default:
+    @just --list
+
+# build sd card image
+build:
+    nix build "$(git rev-parse --show-toplevel)#nixosConfigurations.rpi5.config.system.build.sdImage" --builders "$(just _builders)"

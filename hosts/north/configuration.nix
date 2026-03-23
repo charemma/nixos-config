@@ -59,5 +59,9 @@
   # Allow packages with non-free licenses (e.g. burpsuite, obsidian).
   nixpkgs.config.allowUnfree = true;
 
+  # Let remote builders pull dependencies from their own substituters (e.g. attic cache)
+  # instead of having nix copy everything over SSH.
+  nix.settings.builders-use-substitutes = true;
+
   system.stateVersion = "26.05";
 }

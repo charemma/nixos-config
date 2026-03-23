@@ -1,0 +1,9 @@
+set fallback := true
+
+_default:
+    @just --list
+
+# rebuild and switch to new NixOS configuration
+rebuild:
+    sudo nixos-rebuild switch --flake "$(git rev-parse --show-toplevel)#north"
+    sudo systemctl restart nix-daemon

@@ -18,6 +18,7 @@
   nix.settings = {
     experimental-features = [ "nix-command" "flakes" ];
     trusted-users = [ "charemma" ];
+    builders-use-substitutes = true;
   };
   # Allow packages with non-free licenses.
   nixpkgs.config.allowUnfree = true;
