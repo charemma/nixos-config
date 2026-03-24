@@ -14,6 +14,10 @@ flash device:
     zstdcat {{ _root }}/results/aiagent/sd-image/*.img.zst | sudo dd of={{ device }} bs=4M status=progress
     sync
 
+# deploy config to aiagent over SSH (builds remotely on device)
+deploy:
+    nix shell 'nixpkgs#nixos-rebuild' -c nixos-rebuild switch --flake "{{ _root }}#aiagent" --target-host charemma@aiagent --build-host charemma@aiagent --sudo
+
 # push build closure to binary cache
 push cache="main":
     nix path-info -r "{{ _root }}/results/aiagent" | xargs attic push {{ cache }}

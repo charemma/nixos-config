@@ -26,8 +26,10 @@
   outputs = { self, nixpkgs, nixpkgs-rpi, nix-darwin, disko, nixos-hardware, raspberry-pi-nix, termfilechooser, anker, nix-openclaw, ... }:
   let
     forAllSystems = nixpkgs.lib.genAttrs [ "x86_64-linux" "aarch64-linux" "aarch64-darwin" ];
-    # openclaw-gateway built with current nixpkgs (needs fetchPnpmDeps, not in nixpkgs-rpi)
-    openclawGateway = (nixpkgs.legacyPackages.aarch64-linux.extend nix-openclaw.overlays.default).openclaw-gateway;
+    # packages built with current nixpkgs (nixpkgs-rpi is too old for fetchPnpmDeps / claude-code)
+    newPkgs = nixpkgs.legacyPackages.aarch64-linux;
+    openclawGateway = (newPkgs.extend nix-openclaw.overlays.default).openclaw-gateway;
+    claudeCode = newPkgs.claude-code;
   in {
     devShells = forAllSystems (system: let
       pkgs = nixpkgs.legacyPackages.${system};
@@ -84,7 +86,11 @@
           raspberry-pi-nix.nixosModules.sd-image
           nix-openclaw.nixosModules.openclaw-gateway
           # use openclaw built with current nixpkgs -- nixpkgs-rpi is too old for fetchPnpmDeps
-          { services.openclaw-gateway.package = openclawGateway; }
+          {
+            services.openclaw-gateway.package = openclawGateway;
+            services.openclaw-gateway.servicePath = [ claudeCode ];
+            environment.systemPackages = [ claudeCode ];
+          }
           ./hosts/aiagent/configuration.nix
         ];
       };
