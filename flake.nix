@@ -46,7 +46,10 @@
     # Used for devShells which need to work on all platforms.
     forAllSystems = nixpkgs.lib.genAttrs [ "x86_64-linux" "aarch64-linux" "aarch64-darwin" ];
     # packages built with current nixpkgs (nixpkgs-rpi is too old for fetchPnpmDeps / claude-code)
-    newPkgs = nixpkgs.legacyPackages.aarch64-linux;
+    newPkgs = import nixpkgs {
+      system = "aarch64-linux";
+      config.allowUnfreePredicate = pkg: builtins.elem (nixpkgs.lib.getName pkg) [ "claude-code" ];
+    };
     openclawGateway = (newPkgs.extend nix-openclaw.overlays.default).openclaw-gateway;
     claudeCode = newPkgs.claude-code;
   in {

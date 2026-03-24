@@ -42,6 +42,10 @@
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
+  nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
+    "claude-code"
+  ];
+
   # OpenClaw gateway -- AI assistant reachable via Telegram
   # Secrets (TELEGRAM_BOT_TOKEN) are in /etc/openclaw/secrets.env
   # Create that file manually on first boot -- it is not managed by Nix.
