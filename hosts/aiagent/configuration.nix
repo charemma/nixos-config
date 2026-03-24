@@ -1,4 +1,4 @@
-{ config, lib, pkgs, nodejs-current, ... }:
+{ config, lib, pkgs, nodejs-current, claude-code-pkg, ... }:
 
 {
   imports = [
@@ -55,17 +55,18 @@
     trusted-users = [ "charemma" ];
   };
 
-  # OpenClaw gateway -- AI assistant reachable via Telegram
-  # nix-openclaw packaging is broken (missing plugin manifests), so we install via npm.
-  # First run: install-openclaw && openclaw setup
-  # Runs as a user-level systemd service under charemma.
+  # Claude Code via nix flake (always up to date, hourly builds)
+  # OpenClaw via npm (nix-openclaw packaging is broken)
+  # Run bootstrap-tools after first install or to update openclaw.
   environment.systemPackages = with pkgs; [
+    claude-code-pkg
     nodejs-current
-    (pkgs.writeShellScriptBin "install-openclaw" ''
-      export NPM_CONFIG_PREFIX="$HOME/.npm-global"
+    (pkgs.writeShellScriptBin "bootstrap-tools" ''
+      export NPM_CONFIG_PREFIX="''${NPM_CONFIG_PREFIX:-$HOME/.npm-global}"
       mkdir -p "$NPM_CONFIG_PREFIX"
+      echo "Installing npm tools to $NPM_CONFIG_PREFIX..."
       npm install -g openclaw@latest
-      echo 'Add to PATH: export PATH="$HOME/.npm-global/bin:$PATH"'
+      echo "Done."
     '')
   ];
 

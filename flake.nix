@@ -34,11 +34,13 @@
     # Workday recap CLI tool (personal project).
     anker.url = "github:charemma/anker";
     anker.inputs.nixpkgs.follows = "nixpkgs";
+    claude-code-nix.url = "github:sadjow/claude-code-nix";
+    claude-code-nix.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   # outputs is a function that receives all inputs and returns an attribute set.
   # The `self` argument refers to this flake itself (useful for referencing its own outputs).
-  outputs = { self, nixpkgs, nixpkgs-rpi, nix-darwin, disko, nixos-hardware, raspberry-pi-nix, termfilechooser, anker, ... }:
+  outputs = { self, nixpkgs, nixpkgs-rpi, nix-darwin, disko, nixos-hardware, raspberry-pi-nix, termfilechooser, anker, claude-code-nix, ... }:
   let
     # Helper to produce one attribute per supported system without repeating the list.
     # Used for devShells which need to work on all platforms.
@@ -64,7 +66,7 @@
     darwinConfigurations = {
       macbook = nix-darwin.lib.darwinSystem {
         system = "aarch64-darwin";
-        specialArgs = { inherit anker; };
+        specialArgs = { inherit anker claude-code-nix; };
         modules = [
           ./hosts/macbook/configuration.nix
         ];
@@ -75,9 +77,9 @@
     nixosConfigurations = {
       north = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
-        # Both termfilechooser and anker are flake inputs that modules need directly.
-        # inherit is shorthand for termfilechooser = termfilechooser; anker = anker;
-        specialArgs = { inherit termfilechooser anker; };
+        # termfilechooser, anker and claude-code-nix are flake inputs that modules need directly.
+        # inherit is shorthand for termfilechooser = termfilechooser; etc.
+        specialArgs = { inherit termfilechooser anker claude-code-nix; };
         modules = [
           ./hosts/north/configuration.nix
         ];
@@ -107,6 +109,7 @@
         specialArgs = {
           # nodejs from current nixpkgs (nixpkgs-rpi has v22.10, openclaw needs >=22.12)
           nodejs-current = nixpkgs.legacyPackages.aarch64-linux.nodejs_22;
+          claude-code-pkg = claude-code-nix.packages.aarch64-linux.default;
         };
         modules = [
           raspberry-pi-nix.nixosModules.raspberry-pi
