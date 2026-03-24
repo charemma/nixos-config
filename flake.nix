@@ -34,24 +34,15 @@
     # Workday recap CLI tool (personal project).
     anker.url = "github:charemma/anker";
     anker.inputs.nixpkgs.follows = "nixpkgs";
-    nix-openclaw.url = "github:openclaw/nix-openclaw";
-    nix-openclaw.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   # outputs is a function that receives all inputs and returns an attribute set.
   # The `self` argument refers to this flake itself (useful for referencing its own outputs).
-  outputs = { self, nixpkgs, nixpkgs-rpi, nix-darwin, disko, nixos-hardware, raspberry-pi-nix, termfilechooser, anker, nix-openclaw, ... }:
+  outputs = { self, nixpkgs, nixpkgs-rpi, nix-darwin, disko, nixos-hardware, raspberry-pi-nix, termfilechooser, anker, ... }:
   let
     # Helper to produce one attribute per supported system without repeating the list.
     # Used for devShells which need to work on all platforms.
     forAllSystems = nixpkgs.lib.genAttrs [ "x86_64-linux" "aarch64-linux" "aarch64-darwin" ];
-    # packages built with current nixpkgs (nixpkgs-rpi is too old for fetchPnpmDeps / claude-code)
-    newPkgs = import nixpkgs {
-      system = "aarch64-linux";
-      config.allowUnfreePredicate = pkg: builtins.elem (nixpkgs.lib.getName pkg) [ "claude-code" ];
-    };
-    openclawGateway = (newPkgs.extend nix-openclaw.overlays.default).openclaw-gateway;
-    claudeCode = newPkgs.claude-code;
   in {
     # A development shell with tools for managing infra (Pulumi, kubectl).
     # Enter with `nix develop` in this repo.
@@ -116,13 +107,6 @@
         modules = [
           raspberry-pi-nix.nixosModules.raspberry-pi
           raspberry-pi-nix.nixosModules.sd-image
-          nix-openclaw.nixosModules.openclaw-gateway
-          # use openclaw built with current nixpkgs -- nixpkgs-rpi is too old for fetchPnpmDeps
-          {
-            services.openclaw-gateway.package = openclawGateway;
-            services.openclaw-gateway.servicePath = [ claudeCode ];
-            environment.systemPackages = [ claudeCode ];
-          }
           ./hosts/aiagent/configuration.nix
         ];
       };
