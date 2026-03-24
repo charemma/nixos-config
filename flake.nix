@@ -19,9 +19,11 @@
     termfilechooser.inputs.nixpkgs.follows = "nixpkgs";
     anker.url = "github:charemma/anker";
     anker.inputs.nixpkgs.follows = "nixpkgs";
+    claude-code-nix.url = "github:sadjow/claude-code-nix";
+    claude-code-nix.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, nixpkgs-rpi, nix-darwin, disko, nixos-hardware, raspberry-pi-nix, termfilechooser, anker, ... }:
+  outputs = { self, nixpkgs, nixpkgs-rpi, nix-darwin, disko, nixos-hardware, raspberry-pi-nix, termfilechooser, anker, claude-code-nix, ... }:
   let
     forAllSystems = nixpkgs.lib.genAttrs [ "x86_64-linux" "aarch64-linux" "aarch64-darwin" ];
   in {
@@ -40,7 +42,7 @@
     darwinConfigurations = {
       macbook = nix-darwin.lib.darwinSystem {
         system = "aarch64-darwin";
-        specialArgs = { inherit anker; };
+        specialArgs = { inherit anker claude-code-nix; };
         modules = [
           ./hosts/macbook/configuration.nix
         ];
@@ -50,7 +52,7 @@
     nixosConfigurations = {
       north = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
-        specialArgs = { inherit termfilechooser anker; };
+        specialArgs = { inherit termfilechooser anker claude-code-nix; };
         modules = [
           ./hosts/north/configuration.nix
         ];
@@ -78,6 +80,7 @@
         specialArgs = {
           # nodejs from current nixpkgs (nixpkgs-rpi has v22.10, openclaw needs >=22.12)
           nodejs-current = nixpkgs.legacyPackages.aarch64-linux.nodejs_22;
+          claude-code-pkg = claude-code-nix.packages.aarch64-linux.default;
         };
         modules = [
           raspberry-pi-nix.nixosModules.raspberry-pi
