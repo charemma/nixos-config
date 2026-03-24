@@ -42,32 +42,11 @@
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
-  nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
-    "claude-code"
-  ];
-
-  # OpenClaw gateway -- AI assistant reachable via Telegram
-  # Secrets (TELEGRAM_BOT_TOKEN) are in /etc/openclaw/secrets.env
-  # Create that file manually on first boot -- it is not managed by Nix.
-  # Claude CLI must be authenticated after first boot: `claude login`
-  services.openclaw-gateway = {
-    enable = true;
-    environmentFiles = [ "/etc/openclaw/secrets.env" ];
-    config = {
-      agents.defaults = {
-        model = {
-          primary = "claude-cli/opus-4.6";
-          fallbacks = [ "claude-cli/sonnet-4.6" ];
-        };
-        cliBackends.claude-cli = {
-          command = "claude";
-        };
-      };
-    };
-  };
+  # OpenClaw runs as a user-level systemd service (installed via ~/.openclaw)
+  # Config lives in ~/.openclaw/config/openclaw.json
+  # Claude CLI is the primary backend (Max subscription, no API billing)
 
   # Syncthing -- keeps Obsidian vault in sync with Mac/North
-  # On first boot: note the device ID from `syncthing show-config`, then add it on the Mac.
   services.syncthing = {
     enable = true;
     user = "charemma";

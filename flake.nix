@@ -19,20 +19,11 @@
     termfilechooser.inputs.nixpkgs.follows = "nixpkgs";
     anker.url = "github:charemma/anker";
     anker.inputs.nixpkgs.follows = "nixpkgs";
-    nix-openclaw.url = "github:openclaw/nix-openclaw";
-    nix-openclaw.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, nixpkgs-rpi, nix-darwin, disko, nixos-hardware, raspberry-pi-nix, termfilechooser, anker, nix-openclaw, ... }:
+  outputs = { self, nixpkgs, nixpkgs-rpi, nix-darwin, disko, nixos-hardware, raspberry-pi-nix, termfilechooser, anker, ... }:
   let
     forAllSystems = nixpkgs.lib.genAttrs [ "x86_64-linux" "aarch64-linux" "aarch64-darwin" ];
-    # packages built with current nixpkgs (nixpkgs-rpi is too old for fetchPnpmDeps / claude-code)
-    newPkgs = import nixpkgs {
-      system = "aarch64-linux";
-      config.allowUnfreePredicate = pkg: builtins.elem (nixpkgs.lib.getName pkg) [ "claude-code" ];
-    };
-    openclawGateway = (newPkgs.extend nix-openclaw.overlays.default).openclaw-gateway;
-    claudeCode = newPkgs.claude-code;
   in {
     devShells = forAllSystems (system: let
       pkgs = nixpkgs.legacyPackages.${system};
@@ -87,13 +78,6 @@
         modules = [
           raspberry-pi-nix.nixosModules.raspberry-pi
           raspberry-pi-nix.nixosModules.sd-image
-          nix-openclaw.nixosModules.openclaw-gateway
-          # use openclaw built with current nixpkgs -- nixpkgs-rpi is too old for fetchPnpmDeps
-          {
-            services.openclaw-gateway.package = openclawGateway;
-            services.openclaw-gateway.servicePath = [ claudeCode ];
-            environment.systemPackages = [ claudeCode ];
-          }
           ./hosts/aiagent/configuration.nix
         ];
       };

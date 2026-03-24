@@ -9,10 +9,18 @@
     arp-scan
     chezmoi
     curl
+    fd
+    gcc
     git
+    gnumake
+    gh
     htop
+    jq
+    python3
+    ripgrep
     starship
     tmux
+    tree
     wget
   ];
 }
