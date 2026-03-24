@@ -43,13 +43,22 @@
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
   # OpenClaw gateway -- AI assistant reachable via Telegram
-  # Secrets (ANTHROPIC_API_KEY, TELEGRAM_BOT_TOKEN) are in /etc/openclaw/secrets.env
+  # Secrets (TELEGRAM_BOT_TOKEN) are in /etc/openclaw/secrets.env
   # Create that file manually on first boot -- it is not managed by Nix.
+  # Claude CLI must be authenticated after first boot: `claude login`
   services.openclaw-gateway = {
     enable = true;
     environmentFiles = [ "/etc/openclaw/secrets.env" ];
     config = {
-      apiProviders = [ { type = "anthropic"; } ];
+      agents.defaults = {
+        model = {
+          primary = "claude-cli/opus-4.6";
+          fallbacks = [ "claude-cli/sonnet-4.6" ];
+        };
+        cliBackends.claude-cli = {
+          command = "claude";
+        };
+      };
     };
   };
 
