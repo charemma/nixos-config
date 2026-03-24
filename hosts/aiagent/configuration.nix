@@ -1,4 +1,4 @@
-{ config, lib, pkgs, nodejs-current, claude-code-pkg, ... }:
+{ config, lib, pkgs, nodejs-current, whisper-cpp-pkg, claude-code-pkg, ... }:
 
 {
   imports = [
@@ -61,6 +61,8 @@
   environment.systemPackages = with pkgs; [
     claude-code-pkg
     nodejs-current
+    whisper-cpp-pkg
+    pkgs.ffmpeg
     (pkgs.writeShellScriptBin "bootstrap-tools" ''
       export NPM_CONFIG_PREFIX="''${NPM_CONFIG_PREFIX:-$HOME/.npm-global}"
       mkdir -p "$NPM_CONFIG_PREFIX"
