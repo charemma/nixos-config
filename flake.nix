@@ -53,6 +53,7 @@
     in {
       default = pkgs.mkShell {
         packages = with pkgs; [
+          just
           kubectl
           nodejs
           pulumi
