@@ -22,6 +22,10 @@ deploy:
     nix copy --to ssh://root@aiagent "$toplevel" --no-check-sigs
     ssh root@aiagent "nix-env -p /nix/var/nix/profiles/system --set $toplevel && $toplevel/bin/switch-to-configuration switch"
 
+# rebuild and switch to new NixOS configuration (run on the Pi itself)
+rebuild:
+    sudo nixos-rebuild switch --flake "{{ _root }}#aiagent"
+
 # push build closure to binary cache
 push cache="main":
     nix path-info -r "{{ _root }}/results/aiagent" | xargs attic push {{ cache }}
