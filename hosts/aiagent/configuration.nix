@@ -71,46 +71,6 @@
       npm install -g openclaw@latest
       echo "Done."
     '')
-    (pkgs.writeShellScriptBin "sync-claude-token" ''
-      # Syncs the Claude Code OAuth token to OpenClaw auth-profiles.
-      # Claude Code refreshes tokens automatically; OpenClaw doesn't know about them.
-      # Run this after `claude setup-token` or when the bot stops responding.
-      CREDS="$HOME/.claude/.credentials.json"
-      AUTH="$HOME/.openclaw/agents/main/agent/auth-profiles.json"
-      if [ ! -f "$CREDS" ]; then
-        echo "Error: $CREDS not found. Run 'claude setup-token' first."
-        exit 1
-      fi
-      TOKEN=$(${pkgs.python3}/bin/python3 -c "
-import json, sys
-with open('$CREDS') as f:
-    d = json.load(f)
-t = d.get('claudeAiOauth', {}).get('accessToken', '')
-if not t:
-    print('No OAuth token found', file=sys.stderr)
-    sys.exit(1)
-print(t)
-")
-      if [ -z "$TOKEN" ]; then exit 1; fi
-      ${pkgs.python3}/bin/python3 -c "
-import json
-with open('$AUTH') as f:
-    profiles = json.load(f)
-profiles['profiles']['anthropic:default'] = {
-    'type': 'api_key',
-    'provider': 'anthropic',
-    'key': '$TOKEN'
-}
-with open('$AUTH', 'w') as f:
-    json.dump(profiles, f, indent=2)
-    f.write('\n')
-print('Token synced to OpenClaw')
-print('Token prefix: ' + '$TOKEN'[:15] + '...')
-"
-      echo "Restarting openclaw-gateway..."
-      systemctl --user restart openclaw-gateway
-      echo "Done."
-    '')
   ];
 
   # Syncthing -- keeps Obsidian vault in sync with Mac/North
