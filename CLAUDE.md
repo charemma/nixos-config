@@ -6,11 +6,14 @@ NixOS system configurations for all personal hosts: north (workstation), macbook
 
 ## Git workflow for this repo
 
-**Only commit and push from north.** This repo is edited on north via Claude Code. Other machines (macbook, aiagent, rpi5) are deployment targets -- they receive config updates via `just <host>::deploy` or `just <host>::rebuild`, not via local git commits.
+This repo is edited from multiple machines (north, macbook, aiagent). To avoid merge conflicts:
 
-The OpenClaw bot on aiagent may read files in this repo but must not commit or push changes here.
-
-If you are running on macbook and need to make changes: pull the latest from main, make the change, commit, push. Do not leave uncommitted changes -- either commit or stash before switching machines.
+1. **Always `git pull` before making changes.** If there are uncommitted local changes, stash them first.
+2. **Work on feature branches.** Never commit directly to main unless it's a trivial one-line fix.
+3. **Keep branches focused.** One concern per branch -- don't let scope creep in. If something unrelated comes up, make a separate branch.
+4. **Commit and push before switching machines.** Don't leave dirty worktrees. Either commit, stash, or discard.
+5. **Check the branch still makes sense.** Before committing, review what's on the branch. If it has grown beyond its original scope, split it up.
+6. **Don't rebase branches that are shared across machines.** Rebase only local-only branches. Shared branches get merged, not rebased.
 
 ## Architecture
 
