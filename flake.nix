@@ -112,6 +112,7 @@
           nodejs-current = nixpkgs.legacyPackages.aarch64-linux.nodejs_22;
           whisper-cpp-pkg = nixpkgs.legacyPackages.aarch64-linux.whisper-cpp;
           claude-code-pkg = claude-code-nix.packages.aarch64-linux.default;
+          tailscale-pkg = nixpkgs.legacyPackages.aarch64-linux.tailscale;
         };
         modules = [
           raspberry-pi-nix.nixosModules.raspberry-pi
