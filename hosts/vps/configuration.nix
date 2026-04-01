@@ -12,6 +12,7 @@
     ./disko-config.nix
     ../../modules/core.nix
     ../../modules/binary-cache.nix
+    ../../modules/tailscale.nix
     ../../modules/users.nix
     # Custom NixOS service module for k3s + Traefik + cert-manager.
     ../../services/k3s

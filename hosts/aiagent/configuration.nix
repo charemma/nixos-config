@@ -4,6 +4,7 @@
   imports = [
     ../../modules/core.nix
     ../../modules/binary-cache.nix
+    ../../modules/tailscale.nix
   ];
 
   raspberry-pi-nix.board = "bcm2712";
