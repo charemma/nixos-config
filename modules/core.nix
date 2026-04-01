@@ -12,7 +12,7 @@
 
   # lib.mkDefault sets a value that other modules can still override with a plain assignment.
   # Without mkDefault, two modules assigning the same option would cause a conflict error.
-  environment.variables.EDITOR = lib.mkDefault "vim";
+  environment.variables.EDITOR = lib.mkForce "vim";
 
   # Registers zsh in /etc/shells so it can be used as a login shell.
   # Required before setting shell = pkgs.zsh on any user.
