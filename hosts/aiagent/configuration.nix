@@ -5,6 +5,9 @@
     ../../modules/core.nix
     ../../modules/binary-cache.nix
     ../../modules/tailscale.nix
+    # Override tailscale with current version from nixpkgs-unstable
+    # (nixpkgs-rpi ships an outdated 1.78.1)
+    { services.tailscale.package = tailscale-pkg; }
   ];
 
   raspberry-pi-nix.board = "bcm2712";
