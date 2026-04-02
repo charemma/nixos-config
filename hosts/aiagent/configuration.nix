@@ -1,8 +1,9 @@
-{ config, lib, pkgs, nodejs-current, whisper-cpp-pkg, claude-code-pkg, ... }:
+{ config, lib, pkgs, whisper-cpp-pkg, tailscale-pkg, ... }:
 
 {
   imports = [
     ../../modules/core.nix
+    ../../modules/dev.nix
     ../../modules/binary-cache.nix
     ../../modules/tailscale.nix
     # Override tailscale with current version from nixpkgs-unstable
@@ -50,31 +51,16 @@
 
   programs.zsh.enable = true;
 
-  # npm global installs go to ~/.npm-global (nix store is read-only)
-  environment.sessionVariables.NPM_CONFIG_PREFIX = "$HOME/.npm-global";
-  environment.sessionVariables.PATH = [ "$HOME/.npm-global/bin" ];
-
   nix.settings = {
     experimental-features = [ "nix-command" "flakes" ];
     trusted-users = [ "charemma" ];
   };
 
-  # Claude Code via nix flake (always up to date, hourly builds)
-  # OpenClaw via npm (nix-openclaw packaging is broken)
-  # Run bootstrap-tools after first install or to update openclaw.
+  # Extra packages not covered by dev.nix
   environment.systemPackages = with pkgs; [
-    claude-code-pkg
-    nodejs-current
     whisper-cpp-pkg
-    pkgs.ffmpeg
-    pkgs.lsof
-    (pkgs.writeShellScriptBin "bootstrap-tools" ''
-      export NPM_CONFIG_PREFIX="''${NPM_CONFIG_PREFIX:-$HOME/.npm-global}"
-      mkdir -p "$NPM_CONFIG_PREFIX"
-      echo "Installing npm tools to $NPM_CONFIG_PREFIX..."
-      npm install -g openclaw@latest
-      echo "Done."
-    '')
+    ffmpeg
+    lsof
   ];
 
   # Syncthing -- keeps Obsidian vault in sync with Mac/North

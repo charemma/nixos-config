@@ -108,10 +108,9 @@
       aiagent = nixpkgs-rpi.lib.nixosSystem {
         system = "aarch64-linux";
         specialArgs = {
+          inherit anker claude-code-nix;
           # packages from current nixpkgs (nixpkgs-rpi versions are too old)
-          nodejs-current = nixpkgs.legacyPackages.aarch64-linux.nodejs_22;
           whisper-cpp-pkg = nixpkgs.legacyPackages.aarch64-linux.whisper-cpp;
-          claude-code-pkg = claude-code-nix.packages.aarch64-linux.default;
           tailscale-pkg = nixpkgs.legacyPackages.aarch64-linux.tailscale;
         };
         modules = [
