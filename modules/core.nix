@@ -19,6 +19,15 @@
   programs.zsh.enable = true;
 
   # with pkgs; brings all packages into scope so we can write `curl` instead of `pkgs.curl`.
+  # Syncthing -- keeps Obsidian vault and workspace in sync across hosts
+  services.syncthing = {
+    enable = true;
+    user = "charemma";
+    dataDir = "/home/charemma";
+    configDir = "/home/charemma/.config/syncthing";
+    openDefaultPorts = true;
+  };
+
   environment.systemPackages = with pkgs; [
     arp-scan
     chezmoi

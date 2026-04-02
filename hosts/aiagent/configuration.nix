@@ -63,14 +63,5 @@
     lsof
   ];
 
-  # Syncthing -- keeps Obsidian vault in sync with Mac/North
-  services.syncthing = {
-    enable = true;
-    user = "charemma";
-    dataDir = "/home/charemma";
-    configDir = "/home/charemma/.config/syncthing";
-    openDefaultPorts = true;
-  };
-
   system.stateVersion = "26.05";
 }
