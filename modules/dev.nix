@@ -7,8 +7,7 @@
   environment.sessionVariables.NPM_CONFIG_PREFIX = "$HOME/.npm-global";
   environment.sessionVariables.PATH = [ "$HOME/.npm-global/bin" ];
 
-  # neovim as default editor; alias vim -> nvim for muscle memory
-  environment.variables.EDITOR = lib.mkForce "nvim";
+  # vim -> nvim alias for muscle memory (nixvim.nix sets EDITOR)
   environment.shellAliases.vim = "nvim";
 
   environment.systemPackages = with pkgs; [
@@ -28,7 +27,6 @@
     k9s
     kubectl
     lsd
-    neovim
     nodejs
     ripgrep
     yazi

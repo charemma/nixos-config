@@ -11,6 +11,7 @@
       ../../modules/desktop.nix
       ../../modules/core.nix
       ../../modules/dev.nix
+      ../../modules/nixvim.nix
       ../../modules/remote-desktop.nix
       ../../modules/infosec.nix
       ../../modules/binary-cache.nix
