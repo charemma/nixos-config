@@ -7,6 +7,10 @@
   environment.sessionVariables.NPM_CONFIG_PREFIX = "$HOME/.npm-global";
   environment.sessionVariables.PATH = [ "$HOME/.npm-global/bin" ];
 
+  # neovim as default editor; alias vim -> nvim for muscle memory
+  environment.variables.EDITOR = lib.mkForce "nvim";
+  environment.shellAliases.vim = "nvim";
+
   environment.systemPackages = with pkgs; [
     anker.packages.${pkgs.system}.default
     claude-code-nix.packages.${pkgs.system}.default
