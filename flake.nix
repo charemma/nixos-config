@@ -36,11 +36,14 @@
     anker.inputs.nixpkgs.follows = "nixpkgs";
     claude-code-nix.url = "github:sadjow/claude-code-nix";
     claude-code-nix.inputs.nixpkgs.follows = "nixpkgs";
+
+    # NixVim: declarative neovim configuration via Nix modules.
+    nixvim.url = "github:nix-community/nixvim";
   };
 
   # outputs is a function that receives all inputs and returns an attribute set.
   # The `self` argument refers to this flake itself (useful for referencing its own outputs).
-  outputs = { self, nixpkgs, nixpkgs-rpi, nix-darwin, disko, nixos-hardware, raspberry-pi-nix, termfilechooser, anker, claude-code-nix, ... }:
+  outputs = { self, nixpkgs, nixpkgs-rpi, nix-darwin, disko, nixos-hardware, raspberry-pi-nix, termfilechooser, anker, claude-code-nix, nixvim, ... }:
   let
     # Helper to produce one attribute per supported system without repeating the list.
     # Used for devShells which need to work on all platforms.
@@ -82,6 +85,7 @@
         # inherit is shorthand for termfilechooser = termfilechooser; anker = anker;
         specialArgs = { inherit termfilechooser anker claude-code-nix; };
         modules = [
+          nixvim.nixosModules.nixvim
           ./hosts/north/configuration.nix
         ];
       };
@@ -119,6 +123,7 @@
           tailscale-pkg = nixpkgs.legacyPackages.aarch64-linux.tailscale;
         };
         modules = [
+          nixvim.nixosModules.nixvim
           raspberry-pi-nix.nixosModules.raspberry-pi
           raspberry-pi-nix.nixosModules.sd-image
           # Replace selected packages with current nixpkgs versions
