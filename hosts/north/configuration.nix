@@ -63,5 +63,14 @@
   # Allow packages with non-free licenses (e.g. burpsuite, obsidian).
   nixpkgs.config.allowUnfree = true;
 
+  # Syncthing -- keeps Obsidian vault in sync across hosts
+  services.syncthing = {
+    enable = true;
+    user = "charemma";
+    dataDir = "/home/charemma";
+    configDir = "/home/charemma/.config/syncthing";
+    openDefaultPorts = true;
+  };
+
   system.stateVersion = "26.05";
 }
