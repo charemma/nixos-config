@@ -104,6 +104,7 @@ in {
     keepassxc
     obsidian
     typora
+    libreoffice
     telegram-desktop
     caffeine-ng
     pavucontrol
