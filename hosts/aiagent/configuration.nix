@@ -1,4 +1,4 @@
-{ config, lib, pkgs, whisper-cpp-pkg, tailscale-pkg, ... }:
+{ config, lib, pkgs, whisper-cpp-pkg, tailscale-pkg, bat-pkg, ... }:
 
 {
   imports = [
@@ -56,6 +56,10 @@
     experimental-features = [ "nix-command" "flakes" ];
     trusted-users = [ "charemma" ];
   };
+
+  # Override bat from nixpkgs-rpi (0.24) with current nixpkgs (0.26+)
+  # so --theme=auto and --theme-dark/--theme-light work in bat config.
+  nixpkgs.overlays = [ (final: prev: { bat = bat-pkg; }) ];
 
   # Extra packages not covered by dev.nix
   environment.systemPackages = with pkgs; [

@@ -116,6 +116,7 @@
           # packages from current nixpkgs (nixpkgs-rpi versions are too old)
           whisper-cpp-pkg = nixpkgs.legacyPackages.aarch64-linux.whisper-cpp;
           tailscale-pkg = nixpkgs.legacyPackages.aarch64-linux.tailscale;
+          bat-pkg = nixpkgs.legacyPackages.aarch64-linux.bat;
         };
         modules = [
           nixvim.nixosModules.nixvim
