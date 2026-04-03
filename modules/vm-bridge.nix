@@ -13,6 +13,13 @@
   # The bridge itself gets an IP via DHCP (instead of eno1 directly).
   networking.interfaces.br0.useDHCP = true;
 
+  # NixOS scripted networking sets PartOf=network-setup.service on bridge units.
+  # PartOf stops the bridge when network-setup restarts during nixos-rebuild,
+  # but does NOT restart it afterwards -- leaving the bridge dead until reboot.
+  # Removing PartOf keeps the bridge alive across rebuilds.
+  systemd.services.br0-netdev.unitConfig.PartOf = lib.mkForce "";
+  systemd.services.network-addresses-br0.unitConfig.PartOf = lib.mkForce "";
+
   # QEMU checks this file before allowing a VM to use a bridge.
   # Without this entry, QEMU refuses to attach VMs to br0.
   environment.etc."qemu/bridge.conf".text = ''
