@@ -16,6 +16,7 @@
       ../../modules/binary-cache.nix
       # Creates a network bridge for QEMU VMs (see module for details).
       ../../modules/vm-bridge.nix
+      ../../modules/tailscale.nix
       ../../modules/users.nix
     ];
 
