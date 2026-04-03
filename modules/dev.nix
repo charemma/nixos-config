@@ -31,6 +31,7 @@
     neovim
     nodejs
     ripgrep
+    tig
     yazi
 
     # OpenClaw installed via npm (nix-openclaw packaging is broken).
