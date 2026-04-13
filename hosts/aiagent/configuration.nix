@@ -7,6 +7,7 @@
     ../../modules/nixvim.nix
     ../../modules/binary-cache.nix
     ../../modules/tailscale.nix
+    ../../modules/monitoring.nix
     # Override tailscale with current version from nixpkgs-unstable
     # (nixpkgs-rpi ships an outdated 1.78.1)
     { services.tailscale.package = tailscale-pkg; }
@@ -48,15 +49,6 @@
   security.sudo = {
     enable = true;
     wheelNeedsPassword = false;
-  };
-
-  # Prometheus Node Exporter -- metrics on port 9100
-  # Scraped by Prometheus on k3s via Tailscale (100.65.75.90:9100)
-  services.prometheus.exporters.node = {
-    enable = true;
-    enabledCollectors = [ "systemd" "cpu" "memory" "diskstats" "filesystem" "netdev" "loadavg" "time" ];
-    port = 9100;
-    openFirewall = true;
   };
 
   programs.zsh.enable = true;
