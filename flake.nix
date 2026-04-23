@@ -123,6 +123,7 @@
           raspberry-pi-nix.nixosModules.sd-image
           # Replace selected packages with current nixpkgs versions
           { nixpkgs.overlays = [( final: prev: {
+            bat = nixpkgs.legacyPackages.aarch64-linux.bat;
             gh = nixpkgs.legacyPackages.aarch64-linux.gh;
           })]; }
           ./hosts/aiagent/configuration.nix
