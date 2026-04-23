@@ -101,6 +101,11 @@
           # Provides the raspberry-pi-nix.board option and all RPi-specific config.
           raspberry-pi-nix.nixosModules.raspberry-pi
           raspberry-pi-nix.nixosModules.sd-image
+          # Replace selected packages with current nixpkgs versions
+          # (nixpkgs-rpi is pinned and ships outdated versions)
+          { nixpkgs.overlays = [( final: prev: {
+            gh = nixpkgs.legacyPackages.aarch64-linux.gh;
+          })]; }
           ./hosts/rpi5/configuration.nix
         ];
       };
@@ -116,6 +121,10 @@
         modules = [
           raspberry-pi-nix.nixosModules.raspberry-pi
           raspberry-pi-nix.nixosModules.sd-image
+          # Replace selected packages with current nixpkgs versions
+          { nixpkgs.overlays = [( final: prev: {
+            gh = nixpkgs.legacyPackages.aarch64-linux.gh;
+          })]; }
           ./hosts/aiagent/configuration.nix
         ];
       };

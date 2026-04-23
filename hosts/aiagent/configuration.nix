@@ -51,6 +51,10 @@
 
   programs.zsh.enable = true;
 
+  # nix-ld provides a dynamic linker shim so pre-compiled binaries (e.g. Claude Code
+  # auto-updates) can run on NixOS without patching their ELF interpreter.
+  programs.nix-ld.enable = true;
+
   nix.settings = {
     experimental-features = [ "nix-command" "flakes" ];
     trusted-users = [ "charemma" ];
