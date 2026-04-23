@@ -125,6 +125,8 @@
           { nixpkgs.overlays = [( final: prev: {
             bat = nixpkgs.legacyPackages.aarch64-linux.bat;
             gh = nixpkgs.legacyPackages.aarch64-linux.gh;
+            neovim = nixpkgs.legacyPackages.aarch64-linux.neovim;
+            neovim-unwrapped = nixpkgs.legacyPackages.aarch64-linux.neovim-unwrapped;
           })]; }
           ./hosts/aiagent/configuration.nix
         ];
