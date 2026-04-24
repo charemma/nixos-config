@@ -244,7 +244,6 @@
           markdown = [ "prettier" ];
           nix = [ "nixfmt" ];
           python = [ "ruff_format" ];
-          rust = [ "rustfmt" ];
           sh = [ "shfmt" ];
           typescript = [ "prettier" ];
           yaml = [ "prettier" ];
@@ -334,7 +333,6 @@
       nixfmt-rfc-style
       nodePackages.prettier
       ruff
-      rustfmt
       shfmt
       stylua
     ];
