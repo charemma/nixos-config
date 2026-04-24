@@ -3,8 +3,8 @@
 # Replaces the old kickstart.nvim + lazy.nvim setup with a fully Nix-managed config.
 # No luarocks, no runtime plugin downloads, no Mason -- everything comes from nixpkgs.
 #
-# Languages: Python, Go, TypeScript, Nix, Lua, YAML, Bash, Markdown
-# Not included: C/C++, Rust, Java, Bitbake
+# Languages: Python, Go, Rust, TypeScript, Nix, Lua, YAML, JSON, Bash, Markdown
+# Not included: C/C++, Java, Bitbake
 { config, lib, pkgs, ... }:
 
 {
@@ -136,9 +136,9 @@
       settings = {
         ensure_installed = [
           "bash" "diff" "go" "gomod" "gosum"
-          "html" "json" "lua" "luadoc"
+          "html" "json" "jsonc" "lua" "luadoc"
           "markdown" "markdown_inline"
-          "nix" "python" "query"
+          "nix" "python" "query" "rust"
           "toml" "typescript" "vim" "vimdoc" "yaml"
         ];
         auto_install = true;
@@ -165,6 +165,12 @@
 
         # YAML
         yamlls.enable = true;
+
+        # JSON
+        jsonls.enable = true;
+
+        # Markdown
+        marksman.enable = true;
 
         # Lua (for neovim config editing)
         lua_ls = {
@@ -231,14 +237,17 @@
           lsp_format = "fallback";
         };
         formatters_by_ft = {
-          lua = [ "stylua" ];
-          python = [ "ruff_format" ];
           go = [ "gofmt" ];
+          json = [ "prettier" ];
+          jsonc = [ "prettier" ];
+          lua = [ "stylua" ];
+          markdown = [ "prettier" ];
           nix = [ "nixfmt" ];
+          python = [ "ruff_format" ];
+          rust = [ "rustfmt" ];
+          sh = [ "shfmt" ];
           typescript = [ "prettier" ];
           yaml = [ "prettier" ];
-          markdown = [ "prettier" ];
-          sh = [ "shfmt" ];
         };
       };
     };
@@ -321,13 +330,13 @@
 
     # Extra tools available in PATH for formatters/linters
     extraPackages = with pkgs; [
-      # Formatters
-      stylua
+      # Formatters (LSP servers are managed by NixVim)
       nixfmt-rfc-style
       nodePackages.prettier
-      shfmt
-      # LSP servers are managed by NixVim, but formatters need to be in PATH
       ruff
+      rustfmt
+      shfmt
+      stylua
     ];
   };
 }
