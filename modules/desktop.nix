@@ -114,6 +114,7 @@ in {
     (polybar.override { pulseSupport = true; })
     rofi
     xterm
+    zathura
     # overrideAttrs patches the build phase of the SDDM theme to inject our wallpaper.
     # The sed commands replace placeholders in theme.conf with the actual file path.
     # ${../assets/background-blurred.png} is a Nix path -- it gets copied to the store
