@@ -46,8 +46,11 @@ in {
     # Our custom portal that opens yazi in the terminal instead of a GUI file picker.
     termfilechooserPkg
   ];
-  # Tell the portal which backend to use for file chooser requests in i3 sessions.
+  # Portal backend routing for i3 sessions.
+  # default sends all unmatched portal requests to the GTK backend.
+  # Without this, requests like Screenshot hang until timeout.
   xdg.portal.config.i3 = {
+    default = [ "gtk" ];
     "org.freedesktop.impl.portal.FileChooser" = "termfilechooser";
   };
 
@@ -96,7 +99,7 @@ in {
     brave
     feh
     i3lock-color
-    flameshot
+    gradia
     xkb-switch-i3
     xclip
     fuzzel

@@ -119,6 +119,7 @@
         specialArgs = {
           inherit anker claude-code-nix;
           # packages from current nixpkgs (nixpkgs-rpi versions are too old)
+          codex-pkg = nixpkgs.legacyPackages.aarch64-linux.codex;
           whisper-cpp-pkg = nixpkgs.legacyPackages.aarch64-linux.whisper-cpp;
           tailscale-pkg = nixpkgs.legacyPackages.aarch64-linux.tailscale;
         };

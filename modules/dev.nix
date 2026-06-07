@@ -1,6 +1,10 @@
 # dev.nix -- developer tools for workstations (north, macbook)
-# anker and claude-code-nix are flake inputs, passed in via specialArgs in flake.nix
-{ config, lib, pkgs, anker, claude-code-nix, ... }:
+# anker and claude-code-nix are flake inputs, passed in via specialArgs in flake.nix.
+{ config, lib, pkgs, anker, claude-code-nix, ... }@args:
+
+let
+  codexPkg = args."codex-pkg" or pkgs.codex;
+in
 
 {
   # npm global installs go to ~/.npm-global (nix store is read-only)
@@ -13,6 +17,7 @@
   environment.systemPackages = with pkgs; [
     anker.packages.${pkgs.system}.default
     claude-code-nix.packages.${pkgs.system}.default
+    codexPkg
     attic-client
     bat
     direnv
@@ -31,7 +36,6 @@
     ripgrep
     tig
     yazi
-
     # OpenClaw installed via npm (nix-openclaw packaging is broken).
     # Run bootstrap-tools after first install or to update.
     (pkgs.writeShellScriptBin "bootstrap-tools" ''

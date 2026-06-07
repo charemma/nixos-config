@@ -324,6 +324,9 @@
       };
     };
 
+    # File type icons for telescope, diffview, etc.
+    plugins.web-devicons.enable = true;
+
     # Diffview (git diff viewer)
     plugins.diffview.enable = true;
 
@@ -331,7 +334,7 @@
     extraPackages = with pkgs; [
       # Formatters (LSP servers are managed by NixVim)
       nixfmt-rfc-style
-      nodePackages.prettier
+      prettier
       ruff
       shfmt
       stylua
