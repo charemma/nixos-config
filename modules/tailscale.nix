@@ -8,6 +8,11 @@
   # Enable the Tailscale service (installs the package and starts tailscaled).
   services.tailscale.enable = true;
 
+  # systemd-resolved is required so MagicDNS (100.100.100.100) can forward queries
+  # to upstream resolvers. Without it tailscaled has no DNS manager to read system
+  # resolvers from and external hostnames fail to resolve.
+  services.resolved.enable = true;
+
   # Allow Tailscale's UDP port through the firewall for direct peer connections.
   networking.firewall.allowedUDPPorts = [ config.services.tailscale.port ];
 
