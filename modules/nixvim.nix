@@ -64,6 +64,9 @@
 
       # Format buffer
       { mode = ""; key = "<leader>f"; action = "<cmd>lua require('conform').format({ async = true, lsp_format = 'fallback' })<CR>"; options.desc = "Format buffer"; }
+
+      # Oil file manager
+      { mode = "n"; key = "-"; action = "<cmd>Oil<CR>"; options.desc = "Open parent directory"; }
     ];
 
     # ── Autocommands ─────────────────────────────────────────────────
@@ -319,12 +322,21 @@
     # Diffview (git diff viewer)
     plugins.diffview.enable = true;
 
+    # File icons for Telescope and other plugins
+    plugins.web-devicons.enable = true;
+
+    # Oil (file manager as a buffer)
+    plugins.oil = {
+      enable = true;
+      settings.view_options.show_hidden = true;
+    };
+
     # Extra tools available in PATH for formatters/linters
     extraPackages = with pkgs; [
       # Formatters
       stylua
       nixfmt-rfc-style
-      nodePackages.prettier
+      prettier
       shfmt
       # LSP servers are managed by NixVim, but formatters need to be in PATH
       ruff
