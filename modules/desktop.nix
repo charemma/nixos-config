@@ -61,18 +61,36 @@ in {
 
   services.printing = {
     enable = true;
-    # Gutenprint provides drivers for a wide range of printers.
+    # cups-browsed's implicitclass queues are deprecated upstream and caused jobs to get
+    # stuck "queued" without ever reaching the printer. Use driverless IPP Everywhere
+    # (declared below) plus mDNS discovery via Avahi instead.
+    browsed.enable = false;
+    # Gutenprint kept around for legacy non-driverless printers on the network.
     drivers = [ pkgs.gutenprint ];
-    # retry-job retries failed print jobs instead of cancelling them (useful for flaky printers).
     extraConf = "ErrorPolicy retry-job";
   };
   services.avahi = {
     # Avahi implements mDNS/DNS-SD for local network service discovery (e.g. network printers).
     enable = true;
-    # nssmdns4 plugs Avahi into NSS so hostnames like printer.local resolve without manual DNS.
     nssmdns4 = true;
-    # Open the mDNS port (5353/UDP) in the firewall.
     openFirewall = true;
+  };
+
+  # Driverless IPP Everywhere printer, replaces cups-browsed auto-discovery.
+  # If the printer's DHCP lease changes, update the IP or switch to its mDNS hostname.
+  hardware.printers = {
+    ensurePrinters = [
+      {
+        name = "HP_M148fdw";
+        location = "home";
+        deviceUri = "ipp://192.168.178.132:631/ipp/print";
+        model = "everywhere";
+        ppdOptions = {
+          PageSize = "A4";
+        };
+      }
+    ];
+    ensureDefaultPrinter = "HP_M148fdw";
   };
 
   services.libinput = {
