@@ -113,6 +113,9 @@ in {
   environment.systemPackages = with pkgs; [
     brave
     feh
+    # Pinta: lightweight Paint.NET-style image editor for screenshot composition
+    # (picture-in-picture, annotation, crop). Closest Linux equivalent to macOS Preview.
+    pinta
     i3lock-color
     flameshot
     xkb-switch-i3
