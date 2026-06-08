@@ -35,6 +35,10 @@
 
   networking.hostName = "north";
   networking.networkmanager.enable = true;
+  # Delegate DNS handling to systemd-resolved instead of NM writing /etc/resolv.conf
+  # directly. Without this, NM and Tailscale race on resolv.conf after resume from
+  # suspend/hibernate, leaving DNS broken until manual intervention.
+  networking.networkmanager.dns = "systemd-resolved";
 
   time.timeZone = "Europe/Athens";
   i18n.defaultLocale = "en_US.UTF-8";
