@@ -7,3 +7,7 @@ _default:
 rebuild:
     sudo nixos-rebuild switch --flake "$(git rev-parse --show-toplevel)#north"
     sudo systemctl restart nix-daemon
+
+# stage configuration for next boot (use when switch is blocked, e.g. dbus impl change)
+boot:
+    sudo nixos-rebuild boot --flake "$(git rev-parse --show-toplevel)#north"
