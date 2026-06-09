@@ -7,6 +7,7 @@
     ../../modules/nixvim.nix
     ../../modules/binary-cache.nix
     ../../modules/tailscale.nix
+    ../../modules/monitoring.nix
     # Override tailscale with current version from nixpkgs-unstable
     # (nixpkgs-rpi ships an outdated 1.78.1)
     { services.tailscale.package = tailscale-pkg; }

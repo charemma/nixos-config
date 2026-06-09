@@ -130,6 +130,9 @@
           { nixpkgs.overlays = [( final: prev: {
             bat = nixpkgs.legacyPackages.aarch64-linux.bat;
             gh = nixpkgs.legacyPackages.aarch64-linux.gh;
+            # nixvim.nix references top-level prettier which only exists in
+            # the newer nixpkgs (nixpkgs-rpi still has it under nodePackages).
+            prettier = nixpkgs.legacyPackages.aarch64-linux.prettier;
           })]; }
           ./hosts/aiagent/configuration.nix
         ];
