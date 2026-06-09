@@ -105,6 +105,7 @@ in {
     obsidian
     typora
     libreoffice
+    zathura
     telegram-desktop
     caffeine-ng
     pavucontrol
