@@ -331,7 +331,7 @@
     extraPackages = with pkgs; [
       # Formatters (LSP servers are managed by NixVim)
       nixfmt-rfc-style
-      nodePackages.prettier
+      prettier
       ruff
       shfmt
       stylua
