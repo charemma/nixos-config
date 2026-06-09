@@ -106,6 +106,7 @@ in {
     typora
     libreoffice
     zathura
+    inkscape
     telegram-desktop
     caffeine-ng
     pavucontrol
