@@ -85,6 +85,26 @@
           end
         '';
       }
+      {
+        event = "FileType";
+        pattern = "go";
+        desc = "Go uses tabs; render them narrower than the default 8";
+        callback.__raw = ''
+          function()
+            vim.opt_local.expandtab = false
+            vim.opt_local.tabstop = 4
+            vim.opt_local.shiftwidth = 4
+            vim.opt_local.softtabstop = 0
+          end
+        '';
+      }
+      {
+        event = [ "BufWritePost" "BufReadPost" ];
+        desc = "Run nvim-lint on save and open";
+        callback.__raw = ''
+          function() require("lint").try_lint() end
+        '';
+      }
     ];
 
     # ── Colorscheme ──────────────────────────────────────────────────
@@ -163,7 +183,29 @@
         pyright.enable = true;
 
         # Go
-        gopls.enable = true;
+        gopls = {
+          enable = true;
+          settings.gopls = {
+            gofumpt = true;
+            staticcheck = true;
+            usePlaceholders = true;
+            completeUnimported = true;
+            analyses = {
+              unusedparams = true;
+              unusedwrite = true;
+              shadow = true;
+              nilness = true;
+            };
+            hints = {
+              assignVariableTypes = true;
+              compositeLiteralFields = true;
+              constantValues = true;
+              functionTypeParameters = true;
+              parameterNames = true;
+              rangeVariableTypes = true;
+            };
+          };
+        };
 
         # TypeScript
         ts_ls.enable = true;
@@ -245,7 +287,7 @@
           lsp_format = "fallback";
         };
         formatters_by_ft = {
-          go = [ "gofmt" ];
+          go = [ "goimports" ];
           json = [ "prettier" ];
           jsonc = [ "prettier" ];
           lua = [ "stylua" ];
@@ -256,6 +298,14 @@
           typescript = [ "prettier" ];
           yaml = [ "prettier" ];
         };
+      };
+    };
+
+    # Linting (nvim-lint) -- triggered manually via autocmd below
+    plugins.lint = {
+      enable = true;
+      lintersByFt = {
+        go = [ "golangcilint" ];
       };
     };
 
@@ -356,6 +406,10 @@
       ruff
       shfmt
       stylua
+      # Go: goimports (via gotools) replaces gofmt and fixes imports too
+      gotools
+      # Go linter wired into nvim-lint
+      golangci-lint
     ];
   };
 }
