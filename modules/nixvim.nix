@@ -11,6 +11,8 @@
   programs.nixvim = {
     enable = true;
     defaultEditor = true;  # sets EDITOR=nvim, VISUAL=nvim
+    viAlias = true;
+    vimAlias = true;
 
     # ── General options ──────────────────────────────────────────────
     globals = {
@@ -64,6 +66,12 @@
 
       # Format buffer
       { mode = ""; key = "<leader>f"; action = "<cmd>lua require('conform').format({ async = true, lsp_format = 'fallback' })<CR>"; options.desc = "Format buffer"; }
+
+      # Trouble (diagnostics panel)
+      { mode = "n"; key = "<leader>xx"; action = "<cmd>Trouble diagnostics toggle<CR>"; options.desc = "Diagnostics (Trouble)"; }
+      { mode = "n"; key = "<leader>xb"; action = "<cmd>Trouble diagnostics toggle filter.buf=0<CR>"; options.desc = "Buffer diagnostics (Trouble)"; }
+      { mode = "n"; key = "<leader>xs"; action = "<cmd>Trouble symbols toggle focus=false<CR>"; options.desc = "Symbols (Trouble)"; }
+      { mode = "n"; key = "<leader>xq"; action = "<cmd>Trouble qflist toggle<CR>"; options.desc = "Quickfix list (Trouble)"; }
     ];
 
     # ── Autocommands ─────────────────────────────────────────────────
@@ -274,6 +282,7 @@
         { __unkeyed-1 = "<leader>w"; group = "Workspace"; }
         { __unkeyed-1 = "<leader>t"; group = "Toggle"; }
         { __unkeyed-1 = "<leader>h"; group = "Git Hunk"; mode = [ "n" "v" ]; }
+        { __unkeyed-1 = "<leader>x"; group = "Trouble"; }
       ];
     };
 
@@ -297,7 +306,7 @@
     plugins.fidget.enable = true;
 
     # Sleuth (auto-detect tabstop/shiftwidth)
-    plugins.vim-sleuth.enable = true;
+    plugins.sleuth.enable = true;
 
     # AI code completion (Copilot-compatible inline suggestions)
     plugins.copilot-lua = {
@@ -326,6 +335,18 @@
 
     # Diffview (git diff viewer)
     plugins.diffview.enable = true;
+
+    # Trouble (diagnostics, quickfix and references panel)
+    plugins.trouble = {
+      enable = true;
+      settings = { };
+    };
+
+    # File icons used by telescope, trouble and diffview. Enabling explicitly
+    # silences the nixvim deprecation warning about auto-enabling it.
+    plugins.web-devicons.enable = true;
+
+
 
     # Extra tools available in PATH for formatters/linters
     extraPackages = with pkgs; [
