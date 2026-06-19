@@ -83,14 +83,8 @@ in {
     touchpad.naturalScrolling = true;
   };
 
-  programs.neovim = {
-    enable = true;
-    # Sets neovim as the default editor (EDITOR/VISUAL env vars).
-    defaultEditor = true;
-    # Create `vi` and `vim` symlinks pointing to neovim.
-    viAlias = true;
-    vimAlias = true;
-  };
+  # neovim is provided by nixvim (modules/nixvim.nix). The wrapped binary
+  # already installs vi/vim aliases and sets EDITOR/VISUAL.
 
   environment.systemPackages = with pkgs; [
     brave
