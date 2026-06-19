@@ -39,6 +39,7 @@
     gh
     htop
     jq
+    nvd
     python3
     ripgrep
     starship
