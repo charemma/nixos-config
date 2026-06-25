@@ -7,7 +7,11 @@ _default:
 
 # build sd card image
 build:
-    nix build -o "{{ _root }}/results/rpi5" "{{ _root }}#nixosConfigurations.rpi5.config.system.build.sdImage" --builders "$(just _builders)"
+    #!/usr/bin/env bash
+    set -euo pipefail
+    spec="$(just _builders)"
+    args=(); [ -n "$spec" ] && args=(--builders "$spec")
+    nix build -o "{{ _root }}/results/rpi5" "{{ _root }}#nixosConfigurations.rpi5.config.system.build.sdImage" "${args[@]}"
 
 # flash sd card image to device (usage: just rpi5::flash /dev/sdX)
 flash device:

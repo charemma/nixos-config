@@ -7,7 +7,11 @@ _default:
 
 # build sd card image
 build:
-    nix build -o "{{ _root }}/results/aiagent" "{{ _root }}#nixosConfigurations.aiagent.config.system.build.sdImage" --builders "$(just _builders)"
+    #!/usr/bin/env bash
+    set -euo pipefail
+    spec="$(just _builders)"
+    args=(); [ -n "$spec" ] && args=(--builders "$spec")
+    nix build -o "{{ _root }}/results/aiagent" "{{ _root }}#nixosConfigurations.aiagent.config.system.build.sdImage" "${args[@]}"
 
 # flash sd card image to device (usage: just aiagent::flash /dev/sdX)
 flash device:
@@ -18,7 +22,9 @@ flash device:
 deploy:
     #!/usr/bin/env bash
     set -euo pipefail
-    toplevel=$(nix build "{{ _root }}#nixosConfigurations.aiagent.config.system.build.toplevel" --no-link --print-out-paths --builders "$(just _builders)")
+    spec="$(just _builders)"
+    args=(); [ -n "$spec" ] && args=(--builders "$spec")
+    toplevel=$(nix build "{{ _root }}#nixosConfigurations.aiagent.config.system.build.toplevel" --no-link --print-out-paths "${args[@]}")
     nix copy --to ssh://root@aiagent "$toplevel" --no-check-sigs
     ssh root@aiagent "nix-env -p /nix/var/nix/profiles/system --set $toplevel && $toplevel/bin/switch-to-configuration switch"
 

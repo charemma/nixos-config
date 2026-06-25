@@ -7,9 +7,12 @@ mod vps 'hosts/vps/justfile'
 mod rpi5 'hosts/rpi5/justfile'
 mod aiagent 'hosts/aiagent/justfile'
 
-# internal: use NIX_BUILDERS if set, otherwise fall back to local linux-builder
+# internal: remote builder spec, only when NIX_BUILDERS is set (empty otherwise).
+# Empty means each host builds with its own config: darwin via /etc/nix/machines
+# (the linux-builder VM), linux natively or via binfmt. Set NIX_BUILDERS to
+# offload to a remote builder (e.g. the Hetzner nix-builder).
 _builders:
-    @echo "${NIX_BUILDERS:-ssh-ng://linux-builder aarch64-linux /etc/nix/builder_ed25519 4 1 - - -}"
+    @echo "${NIX_BUILDERS:-}"
 
 # push all build results to binary cache
 push cache="main":
