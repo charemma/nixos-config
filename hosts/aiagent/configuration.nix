@@ -21,7 +21,31 @@
   };
 
   networking.hostName = "aiagent";
-  networking.useDHCP = true;
+  networking.networkmanager.enable = true;
+
+  # Disable wifi radio while a wired link is up, re-enable when it drops.
+  # Credentials are entered once on the device:
+  #   nmcli device wifi connect <SSID> password <PWD>
+  networking.networkmanager.dispatcherScripts = [{
+    source = pkgs.writeShellScript "wifi-toggle-on-ethernet" ''
+      action=$2
+      case "$CONNECTION_TYPE" in
+        802-3-ethernet) ;;
+        *) exit 0 ;;
+      esac
+      case "$action" in
+        up)
+          ${pkgs.networkmanager}/bin/nmcli radio wifi off
+          ;;
+        down)
+          if ! ${pkgs.networkmanager}/bin/nmcli -t -f TYPE,STATE device status \
+              | grep -q '^ethernet:connected$'; then
+            ${pkgs.networkmanager}/bin/nmcli radio wifi on
+          fi
+          ;;
+      esac
+    '';
+  }];
 
   time.timeZone = "Europe/Athens";
   i18n.defaultLocale = "en_US.UTF-8";
@@ -31,7 +55,7 @@
     isNormalUser = true;
     uid = 1000;
     group = "charemma";
-    extraGroups = [ "wheel" ];
+    extraGroups = [ "wheel" "networkmanager" ];
     shell = pkgs.zsh;
     initialHashedPassword = "";
     openssh.authorizedKeys.keys = [
