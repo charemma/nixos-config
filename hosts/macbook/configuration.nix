@@ -9,11 +9,15 @@
     ../../modules/core.nix
     ../../modules/dev.nix
     ../../modules/binary-cache.nix
+    ../../modules/nix-builder.nix
   ];
 
   networking.hostName = "macbook";
 
   time.timeZone = "Europe/Athens";
+
+  # sops-nix decrypts secrets with an age identity derived from this SSH key.
+  sops.age.sshKeyPaths = [ "/Users/charemma/.ssh/id_ed25519" ];
 
   nix.settings = {
     experimental-features = [ "nix-command" "flakes" ];

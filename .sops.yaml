@@ -1,0 +1,24 @@
+# sops-nix recipients and creation rules.
+#
+# Secrets are encrypted to one age recipient per machine that must read them.
+# Each machine decrypts with its own private key, so adding a host means adding
+# its recipient here and running `sops updatekeys secrets/<file>`.
+#
+# Recipient ages are derived from each host's SSH ed25519 public key:
+#   macbook -> ssh-to-age < ~/.ssh/id_ed25519.pub        (user key)
+#   <nixos> -> ssh-to-age < /etc/ssh/ssh_host_ed25519_key.pub  (host key)
+keys:
+  - &macbook age1u7kz9ze207mutj7n6s5t9hgszj8hsl7lp4v2hyycq5p20gejhq8qrush2m
+  # - &north age1...  # add via: ssh-to-age < <(ssh north cat /etc/ssh/ssh_host_ed25519_key.pub)
+
+creation_rules:
+  # The nix remote builder key is only consumed by build clients (macbook).
+  - path_regex: secrets/nix-builder\.yaml$
+    key_groups:
+      - age:
+          - *macbook
+  # Default for any other secret: encrypt to all known hosts.
+  - path_regex: secrets/[^/]+\.yaml$
+    key_groups:
+      - age:
+          - *macbook

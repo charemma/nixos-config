@@ -39,11 +39,16 @@
 
     # NixVim: declarative neovim configuration via Nix modules.
     nixvim.url = "github:nix-community/nixvim";
+
+    # sops-nix: declarative secret management. Secrets are encrypted in git and
+    # decrypted on each host with its own key. Used for the nix remote builder key.
+    sops-nix.url = "github:Mic92/sops-nix";
+    sops-nix.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   # outputs is a function that receives all inputs and returns an attribute set.
   # The `self` argument refers to this flake itself (useful for referencing its own outputs).
-  outputs = { self, nixpkgs, nixpkgs-rpi, nix-darwin, disko, nixos-hardware, raspberry-pi-nix, termfilechooser, anker, claude-code-nix, nixvim, ... }:
+  outputs = { self, nixpkgs, nixpkgs-rpi, nix-darwin, disko, nixos-hardware, raspberry-pi-nix, termfilechooser, anker, claude-code-nix, nixvim, sops-nix, ... }:
   let
     # Helper to produce one attribute per supported system without repeating the list.
     # Used for devShells which need to work on all platforms.
@@ -72,6 +77,7 @@
         system = "aarch64-darwin";
         specialArgs = { inherit anker claude-code-nix; };
         modules = [
+          sops-nix.darwinModules.sops
           ./hosts/macbook/configuration.nix
         ];
       };

@@ -18,7 +18,7 @@ flash device:
 deploy:
     #!/usr/bin/env bash
     set -euo pipefail
-    toplevel=$(nix build "{{ _root }}#nixosConfigurations.aiagent.config.system.build.toplevel" --no-link --print-out-paths)
+    toplevel=$(nix build "{{ _root }}#nixosConfigurations.aiagent.config.system.build.toplevel" --no-link --print-out-paths --builders "$(just _builders)")
     nix copy --to ssh://root@aiagent "$toplevel" --no-check-sigs
     ssh root@aiagent "nix-env -p /nix/var/nix/profiles/system --set $toplevel && $toplevel/bin/switch-to-configuration switch"
 
