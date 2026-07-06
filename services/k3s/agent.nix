@@ -38,5 +38,13 @@ in {
       after = [ "tailscaled.service" ];
       wants = [ "tailscaled.service" ];
     };
+
+    # Enable the memory cgroup controller on kernels that ship it disabled by
+    # default (notably the raspberry-pi kernel). Without this, k3s fails with
+    # "failed to find memory cgroup (v2)". Takes effect after reboot.
+    boot.kernelParams = [
+      "cgroup_enable=memory"
+      "cgroup_memory=1"
+    ];
   };
 }
