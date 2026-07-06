@@ -27,7 +27,6 @@
   services.k3s-agent = {
     enable = true;
     serverHost = "vps.tail48929d.ts.net";
-    nodeIP = ""; # fill in after first deploy: tailscale ip -4
   };
 
   hardware.bluetooth.enable = true;

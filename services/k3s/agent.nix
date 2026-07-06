@@ -15,14 +15,6 @@ in {
       description = "Tailscale FQDN of the k3s server, e.g. vps.tail48929d.ts.net";
     };
 
-    # The node IP k3s advertises to the cluster. Must be the Tailscale IP so
-    # the server can reach this agent for kubelet, exec, and pod networking.
-    # Find it with: tailscale ip -4
-    nodeIP = lib.mkOption {
-      type = lib.types.str;
-      description = "Tailscale IP of this node (100.x.x.x). Run 'tailscale ip -4' to find it.";
-    };
-
     tokenFile = lib.mkOption {
       type = lib.types.path;
       default = "/etc/k3s/token";
@@ -36,9 +28,9 @@ in {
       role = "agent";
       serverAddr = "https://${cfg.serverHost}:6443";
       tokenFile = cfg.tokenFile;
-      extraFlags = toString (
-        lib.optional (cfg.nodeIP != "") "--node-ip=${cfg.nodeIP}"
-      );
+      extraFlags = toString [
+        "--flannel-iface=tailscale0"
+      ];
     };
 
     # k3s agent must start after Tailscale so serverHost is reachable.
