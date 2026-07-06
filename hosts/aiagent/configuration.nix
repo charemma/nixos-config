@@ -8,6 +8,7 @@
     ../../modules/binary-cache.nix
     ../../modules/tailscale.nix
     ../../modules/monitoring.nix
+    ../../services/k3s/agent.nix
     # Override tailscale with current version from nixpkgs-unstable
     # (nixpkgs-rpi ships an outdated 1.78.1)
     { services.tailscale.package = tailscale-pkg; }
@@ -47,6 +48,14 @@
     '';
   }];
 
+  services.k3s-agent = {
+    enable = true;
+    serverHost = "vps.tail48929d.ts.net";
+    nodeIP = ""; # fill in after first deploy: tailscale ip -4
+  };
+
+  hardware.bluetooth.enable = true;
+
   time.timeZone = "Europe/Athens";
   i18n.defaultLocale = "en_US.UTF-8";
 
@@ -55,7 +64,7 @@
     isNormalUser = true;
     uid = 1000;
     group = "charemma";
-    extraGroups = [ "wheel" "video" "networkmanager" ];
+    extraGroups = [ "wheel" "video" "networkmanager" "bluetooth" ];
     shell = pkgs.zsh;
     initialHashedPassword = "";
     openssh.authorizedKeys.keys = [
@@ -141,7 +150,7 @@
       threshold = 1500;
       noise_level = 32;
       event_gap = 60;
-      pre_capture = 15;
+      pre_capture = 150;
       post_capture = 30;
       picture_output = "first";
       movie_output = "on";

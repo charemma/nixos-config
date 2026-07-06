@@ -35,6 +35,7 @@
     enable = true;
     domain = "charemma.de";
     acmeEmail = "me@charemma.de";
+    extraSANs = [ "vps.tail48929d.ts.net" ];
   };
 
   # bash is enabled so the root user (which defaults to bash) has a functional shell.

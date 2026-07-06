@@ -20,6 +20,12 @@ in {
       description = "Primary domain for TLS SAN and ACME.";
     };
 
+    extraSANs = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [];
+      description = "Additional Subject Alternative Names for the k3s API cert (e.g. Tailscale hostnames).";
+    };
+
     acmeEmail = lib.mkOption {
       type = lib.types.str;
       description = "Email for Let's Encrypt certificate notifications.";
@@ -35,9 +41,10 @@ in {
       # toString converts the list to a space-separated string of flags.
       # --tls-san adds the domain as a Subject Alternative Name to the k3s API cert,
       # so kubectl can connect via the domain name instead of only the IP.
-      extraFlags = toString [
-        "--tls-san=${cfg.domain}"
-      ];
+      extraFlags = toString (
+        [ "--tls-san=${cfg.domain}" ]
+        ++ map (san: "--tls-san=${san}") cfg.extraSANs
+      );
     };
 
     # k3s serves HTTP (for ACME HTTP-01 challenge), HTTPS, and the Kubernetes API.
