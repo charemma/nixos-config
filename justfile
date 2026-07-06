@@ -7,9 +7,19 @@ mod vps 'hosts/vps/justfile'
 mod rpi5 'hosts/rpi5/justfile'
 mod aiagent 'hosts/aiagent/justfile'
 
-# internal: use NIX_BUILDERS if set, otherwise fall back to local linux-builder
+# internal: builders string for `nix build --builders`.
+# Precedence: NIX_BUILDERS env > reachable linux-builder SSH host > empty (local only).
+# Empty string tells nix to use no remote builders, so aarch64 builds fall back to
+# local binfmt emulation.
 _builders:
-    @echo "${NIX_BUILDERS:-ssh-ng://linux-builder aarch64-linux /etc/nix/builder_ed25519 4 1 - - -}"
+    #!/usr/bin/env bash
+    if [ -n "${NIX_BUILDERS:-}" ]; then
+        echo "$NIX_BUILDERS"
+    elif ssh -o ConnectTimeout=3 -o BatchMode=yes linux-builder true 2>/dev/null; then
+        echo "ssh-ng://linux-builder aarch64-linux /etc/nix/builder_ed25519 4 1 - - -"
+    else
+        echo ""
+    fi
 
 # push all build results to binary cache
 push cache="main":
