@@ -23,6 +23,9 @@
 
   networking.hostName = "aiagent";
   networking.useDHCP = true;
+  # Explicit nameservers so DNS works regardless of DHCP-supplied DNS or tailscale DNS state.
+  # systemd-resolved uses these as global DNS if no link-specific DNS is configured.
+  networking.nameservers = [ "1.1.1.1" "8.8.8.8" ];
 
   services.k3s-agent = {
     enable = true;
