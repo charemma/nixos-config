@@ -133,6 +133,9 @@
             # nixvim.nix references top-level prettier which only exists in
             # the newer nixpkgs (nixpkgs-rpi still has it under nodePackages).
             prettier = nixpkgs.legacyPackages.aarch64-linux.prettier;
+            # Pin k3s to unstable's version so aiagent's k3s-agent matches vps's k3s-server
+            # (nixpkgs-rpi ships k3s 1.31, unstable ships 1.35+, gap breaks worker-server compatibility).
+            k3s = nixpkgs.legacyPackages.aarch64-linux.k3s;
           })]; }
           ./hosts/aiagent/configuration.nix
         ];

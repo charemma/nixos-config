@@ -23,6 +23,9 @@
 
   networking.hostName = "aiagent";
   networking.networkmanager.enable = true;
+  # Explicit nameservers so DNS works even if DHCP does not supply them or
+  # tailscale runs with -DefaultRoute (only tailnet queries via 100.100.100.100).
+  networking.nameservers = [ "1.1.1.1" "8.8.8.8" ];
 
   # Disable wifi radio while a wired link is up, re-enable when it drops.
   # Credentials are entered once on the device:
