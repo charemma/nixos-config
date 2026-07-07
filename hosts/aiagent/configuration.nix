@@ -23,6 +23,10 @@
 
   networking.hostName = "aiagent";
   networking.networkmanager.enable = true;
+  # Drop VPN plugins on this headless RPi5. The default NM plugin set pulls the
+  # -gnome VPN variants (libnma, gtk4, webkitgtk) which take an hour to build
+  # under aarch64 emulation and are useless without a GUI. Tailscale handles VPN.
+  networking.networkmanager.plugins = lib.mkForce [];
   # Explicit nameservers so DNS works even if DHCP does not supply them or
   # tailscale runs with -DefaultRoute (only tailnet queries via 100.100.100.100).
   networking.nameservers = [ "1.1.1.1" "8.8.8.8" ];
