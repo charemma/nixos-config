@@ -8,6 +8,35 @@ let
   # Select the default package for the current system from the flake output.
   # pkgs.system is e.g. "x86_64-linux".
   termfilechooserPkg = termfilechooser.packages.${pkgs.system}.default;
+
+  # simple-scan post-processing script: OCR the freshly scanned PDF.
+  # Configure simple-scan preferences to run "ocr-script" as post-processor.
+  # simple-scan args: $1=mime, $2=keep_original, $3=filename, $4..=extra args.
+  ocrScript = pkgs.writeShellApplication {
+    name = "ocr-script";
+    runtimeInputs = with pkgs; [ ocrmypdf libnotify ];
+    text = ''
+      filename=$3
+      keep_original=$2
+
+      if [[ "$keep_original" == "true" ]]; then
+        ocr_filename="''${filename%.*}.ocr.''${filename##*.}"
+        extra_msg_details="Saved as ''${ocr_filename##*/}.\nOriginal saved as ''${filename##*/}."
+      else
+        extra_msg_details="Saved as ''${filename##*/}."
+      fi
+
+      LOG_FILE=/tmp/ocr.log
+      : > "$LOG_FILE"
+
+      if ! ocrmypdf --deskew --clean --force-ocr -l deu+ell "$filename" "''${ocr_filename-$filename}" &>> "$LOG_FILE"; then
+        notify-send -i scanner "OCR Failed" "See $LOG_FILE"
+        exit 1
+      fi
+
+      notify-send -i scanner "OCR Complete" "$extra_msg_details"
+    '';
+  };
 in {
   services.xserver = {
     # Enable the X11 display server.
@@ -104,6 +133,9 @@ in {
     kitty
     keepassxc
     simple-scan
+    ocrmypdf
+    (tesseract.override { enableLanguages = [ "eng" "deu" "ell" ]; })
+    ocrScript
     obsidian
     typora
     libreoffice
