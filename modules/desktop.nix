@@ -139,6 +139,7 @@ in {
     obsidian
     typora
     libreoffice
+    gimp
     zathura
     inkscape
     telegram-desktop
