@@ -5,6 +5,10 @@
 # lib provides utility functions (mkDefault, mkOption, types, ...).
 { config, lib, pkgs, ... }:
 
+let
+  # Home directory differs between NixOS (/home) and nix-darwin (/Users).
+  homeDir = if pkgs.stdenv.isDarwin then "/Users/charemma" else "/home/charemma";
+in
 {
   services.openssh.enable = true;
 
@@ -18,13 +22,16 @@
   # Required before setting shell = pkgs.zsh on any user.
   programs.zsh.enable = true;
 
-  # with pkgs; brings all packages into scope so we can write `curl` instead of `pkgs.curl`.
-  # Syncthing -- keeps Obsidian vault and workspace in sync across hosts
+  # Syncthing keeps Obsidian vault and ~/.claude/ in sync across all hosts.
+  # Folders (Obsidian vault, claude memory) are configured once via the web UI
+  # at http://localhost:8384 -- Nix only manages the daemon itself.
+  # openDefaultPorts is NixOS-only (nix-darwin has no firewall module).
   services.syncthing = {
     enable = true;
     user = "charemma";
-    dataDir = "/home/charemma";
-    configDir = "/home/charemma/.config/syncthing";
+    dataDir = homeDir;
+    configDir = "${homeDir}/.config/syncthing";
+  } // lib.optionalAttrs (!pkgs.stdenv.isDarwin) {
     openDefaultPorts = true;
   };
 
