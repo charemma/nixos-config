@@ -191,6 +191,7 @@ in {
     gimp
     zathura
     inkscape
+    poppler-utils
     telegram-desktop
     caffeine-ng
     pavucontrol
