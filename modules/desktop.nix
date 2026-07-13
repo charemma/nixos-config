@@ -137,7 +137,19 @@ in {
 
   fonts.packages = with pkgs; [
     corefonts
+    dejavu_fonts
+    liberation_ttf
+    noto-fonts
+    noto-fonts-emoji
   ];
+
+  # Run AppImages transparently: `programs.appimage.enable` installs the
+  # appimage-run wrapper; `binfmt = true` registers a kernel binfmt handler
+  # so `./foo.AppImage` executes directly without wrapping.
+  programs.appimage = {
+    enable = true;
+    binfmt = true;
+  };
   services.avahi = {
     # Avahi implements mDNS/DNS-SD for local network service discovery (e.g. network printers).
     enable = true;
@@ -160,6 +172,7 @@ in {
 
   environment.systemPackages = with pkgs; [
     brave
+    dunst
     feh
     i3lock-color
     flameshot
