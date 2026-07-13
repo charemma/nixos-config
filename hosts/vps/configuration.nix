@@ -11,7 +11,6 @@
     # Declarative disk partitioning via disko (used during nixos-anywhere install).
     ./disko-config.nix
     ../../modules/core.nix
-    ../../modules/binary-cache.nix
     ../../modules/tailscale.nix
     ../../modules/monitoring.nix
     ../../modules/users.nix

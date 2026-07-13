@@ -25,7 +25,3 @@ deploy:
 # rebuild and switch to new NixOS configuration (run on the Pi itself)
 rebuild:
     sudo nixos-rebuild switch --flake "{{ _root }}#aiagent"
-
-# push build closure to binary cache
-push cache="main":
-    nix path-info -r "{{ _root }}/results/aiagent" | xargs attic push {{ cache }}

@@ -17,7 +17,3 @@ flash device:
 # deploy config to running device over SSH
 deploy:
     nixos-rebuild switch --flake "{{ _root }}#rpi5" --target-host charemma@rpi5 --use-remote-sudo
-
-# push build closure to binary cache
-push cache="main":
-    nix path-info -r "{{ _root }}/results/rpi5" | xargs attic push {{ cache }}

@@ -45,7 +45,6 @@ just aiagent::flash      # flash SD card image to device
 
 - Initial full build: use a remote builder (Hetzner cloud) -- `just aiagent::build` with NIX_BUILDERS set
 - Iterative changes: build locally via binfmt emulation -- most of the closure is cached in the local nix store
-- Push results to attic cache: `just push` or `just aiagent::push`
 - Remote builders need `builders-use-substitutes = true` on the client (north/macbook) to pull from cache instead of SSH
 
 ## Syncthing warning

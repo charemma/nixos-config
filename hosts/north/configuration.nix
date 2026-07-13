@@ -14,7 +14,6 @@
       ../../modules/nixvim.nix
       ../../modules/remote-desktop.nix
       ../../modules/infosec.nix
-      ../../modules/binary-cache.nix
       ../../modules/tailscale.nix
       ../../modules/monitoring.nix
       ../../modules/users.nix
@@ -61,7 +60,7 @@
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
   nix.settings.trusted-users = [ "charemma" ];
-  # Let remote builders pull dependencies from their own substituters (e.g. attic cache)
+  # Let remote builders pull dependencies from their own substituters
   # instead of having nix copy everything over SSH.
   nix.settings.builders-use-substitutes = true;
   # Allow packages with non-free licenses (e.g. burpsuite, obsidian).

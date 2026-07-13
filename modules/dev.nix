@@ -13,7 +13,6 @@
   environment.systemPackages = with pkgs; [
     anker.packages.${pkgs.system}.default
     claude-code-nix.packages.${pkgs.system}.default
-    attic-client
     bat
     direnv
     fastfetch

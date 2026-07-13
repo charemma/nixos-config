@@ -5,7 +5,6 @@
     ../../modules/core.nix
     ../../modules/dev.nix
     ../../modules/nixvim.nix
-    ../../modules/binary-cache.nix
     ../../modules/tailscale.nix
     ../../modules/monitoring.nix
     ../../services/k3s/agent.nix
