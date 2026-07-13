@@ -90,6 +90,9 @@ in {
 
   services.printing = {
     enable = true;
+    # cups-browsed keeps re-creating a duplicate temporary queue for the HP via
+    # mDNS. Since the printer is declared statically below, browsed only adds noise.
+    browsed.enable = false;
     # Gutenprint provides drivers for a wide range of printers.
     drivers = [ pkgs.gutenprint ];
     # retry-job retries failed print jobs instead of cancelling them (useful for flaky printers).
@@ -110,6 +113,9 @@ in {
 
   # SANE backend for scanners. simple-scan below is the GUI.
   hardware.sane.enable = true;
+  # The `net` backend probes for a saned server that is not running, adding a
+  # noticeable timeout to every simple-scan startup. Only the escl backend is used.
+  hardware.sane.disabledDefaultBackends = [ "net" ];
 
   # Pin the eSCL scanner (HP LaserJet Pro M148fdw at 192.168.1.33) so SANE
   # does not spend startup time on mDNS discovery over all backends.
