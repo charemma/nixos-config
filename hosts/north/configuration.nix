@@ -70,7 +70,8 @@
   # Wake on LAN -- lets aiagent (on the same LAN) wake north remotely.
   # Find the interface name: ip link | grep -E '^[0-9]+: en'
   # Replace "enp6s0" below with the actual name, then: just north::rebuild
-  networking.interfaces."enp6s0".wakeOnLan.enable = true;
+  # MAC: 10:7c:61:45:d8:99
+  networking.interfaces."eno1".wakeOnLan.enable = true;
 
   # NFS client: mount aiagent's ~/code at /code.
   # x-systemd.automount defers the actual mount until first access and survives
