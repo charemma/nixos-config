@@ -29,12 +29,15 @@ let
       LOG_FILE=/tmp/ocr.log
       : > "$LOG_FILE"
 
+      # notify-send fails when no notification daemon is running on the session
+      # bus. Do not let that kill the script (set -o errexit) so simple-scan
+      # reports success when the OCR itself succeeded.
       if ! ocrmypdf --deskew --clean --force-ocr -l deu+ell "$filename" "''${ocr_filename-$filename}" &>> "$LOG_FILE"; then
-        notify-send -i scanner "OCR Failed" "See $LOG_FILE"
+        notify-send -i scanner "OCR Failed" "See $LOG_FILE" || true
         exit 1
       fi
 
-      notify-send -i scanner "OCR Complete" "$extra_msg_details"
+      notify-send -i scanner "OCR Complete" "$extra_msg_details" || true
     '';
   };
 in {
