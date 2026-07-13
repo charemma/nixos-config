@@ -67,5 +67,24 @@
   # Allow packages with non-free licenses (e.g. burpsuite, obsidian).
   nixpkgs.config.allowUnfree = true;
 
+  # NFS client: mount aiagent's ~/code at /code.
+  # x-systemd.automount defers the actual mount until first access and survives
+  # aiagent being temporarily unreachable (soft + timeout prevent hard hangs).
+  systemd.tmpfiles.rules = [ "d /code 0755 root root -" ];
+
+  fileSystems."/code" = {
+    device = "aiagent.tail48929d.ts.net:/home/charemma/code";
+    fsType = "nfs4";
+    options = [
+      "_netdev"
+      "noauto"
+      "x-systemd.automount"
+      "x-systemd.idle-timeout=600"
+      "soft"
+      "timeo=30"
+      "retrans=2"
+    ];
+  };
+
   system.stateVersion = "26.05";
 }
