@@ -35,6 +35,25 @@
     qemu  # run NixOS VMs locally for testing
   ];
 
+  # NFS client: mount aiagent's ~/code at /code via macOS autofs.
+  # Uses NFSv3 + resvport (macOS convention). all_squash on server maps every
+  # incoming UID to charemma (1000), so access works regardless of local uid.
+  environment.etc."auto_master".text = ''
+    +auto_master
+    /home  auto_home  -nobrowse,hidefromfinder
+    /-  /etc/auto_code  --timeout=600
+  '';
+  environment.etc."auto_code".text = ''
+    /code  -resvport,soft,intr,timeo=30,retrans=2,vers=3  aiagent.tail48929d.ts.net:/home/charemma/code
+  '';
+
+  system.activationScripts.nfsCodeMount = {
+    text = ''
+      mkdir -p /code
+      /usr/sbin/automount -vc 2>/dev/null || true
+    '';
+  };
+
   # The version of nix-darwin this config was first set up with.
   # Integer format (6) instead of the NixOS string format ("26.05").
   system.stateVersion = 6;
