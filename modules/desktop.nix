@@ -96,8 +96,26 @@ in {
     extraConf = "ErrorPolicy retry-job";
   };
 
+  # Declarative printer queue for the HP LaserJet Pro M148fdw at 192.168.1.33
+  # (DHCP-reserved). Uses driverless IPP Everywhere, no cups-browsed needed.
+  hardware.printers = {
+    ensurePrinters = [{
+      name = "HP-M148fdw";
+      location = "Home";
+      deviceUri = "ipp://192.168.1.33/ipp/print";
+      model = "everywhere";
+    }];
+    ensureDefaultPrinter = "HP-M148fdw";
+  };
+
   # SANE backend for scanners. simple-scan below is the GUI.
   hardware.sane.enable = true;
+
+  # Pin the eSCL scanner (HP LaserJet Pro M148fdw at 192.168.1.33) so SANE
+  # does not spend startup time on mDNS discovery over all backends.
+  environment.etc."sane.d/escl.conf".text = ''
+    https://192.168.1.33:443
+  '';
 
   fonts.packages = with pkgs; [
     corefonts
