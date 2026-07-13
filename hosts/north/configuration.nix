@@ -67,6 +67,11 @@
   # Allow packages with non-free licenses (e.g. burpsuite, obsidian).
   nixpkgs.config.allowUnfree = true;
 
+  # Wake on LAN -- lets aiagent (on the same LAN) wake north remotely.
+  # Find the interface name: ip link | grep -E '^[0-9]+: en'
+  # Replace "enp6s0" below with the actual name, then: just north::rebuild
+  networking.interfaces."enp6s0".wakeOnLan.enable = true;
+
   # NFS client: mount aiagent's ~/code at /code.
   # x-systemd.automount defers the actual mount until first access and survives
   # aiagent being temporarily unreachable (soft + timeout prevent hard hangs).

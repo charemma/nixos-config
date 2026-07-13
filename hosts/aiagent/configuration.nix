@@ -103,6 +103,7 @@
 
   # Extra packages not covered by dev.nix
   environment.systemPackages = with pkgs; [
+    wakeonlan  # send WoL magic packet to wake north: wakeonlan <north-MAC>
     whisper-cpp-pkg
     ffmpeg
     lsof
