@@ -26,7 +26,7 @@ All actual configuration stays here, `nixos-rebuild` just follows the redirect.
 |------|------|----------|---------|
 | `north` | x86_64 | NixOS | Build workstation -- full desktop (niri/i3), infosec tooling |
 | `macbook` | aarch64 | nix-darwin | MacBook -- dev machine |
-| `vps` | x86_64 | NixOS | VPS for charemma.de -- k3s with Traefik, attic binary cache |
+| `vps` | x86_64 | NixOS | VPS for charemma.de -- k3s with Traefik |
 | `rpi5` | aarch64 | NixOS | Headless Raspberry Pi 5 server |
 
 ## Modules
@@ -39,7 +39,6 @@ Shared modules under `modules/` that hosts import selectively:
 - **remote-access.nix** -- SSH + xRDP
 - **infosec.nix** -- security/pentest tooling
 - **laptop.nix** -- power management, touchpad
-- **binary-cache.nix** -- nix.charemma.de substituter config
 
 ## Services
 
@@ -49,7 +48,7 @@ Self-contained NixOS modules under `services/`:
 
 ## Infrastructure
 
-k8s workloads (ArgoCD, attic, Prometheus/Grafana) are managed in the
+k8s workloads (ArgoCD, Prometheus/Grafana) are managed in the
 [infra](https://github.com/charemma/infra) repo via Pulumi and GitOps.
 
 ## Usage
