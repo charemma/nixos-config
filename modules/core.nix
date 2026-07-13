@@ -51,6 +51,8 @@ in
     starship
     tmux
     tree
+    unzip
     wget
+    zip
   ];
 }
