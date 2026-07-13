@@ -113,9 +113,18 @@ in {
 
   # SANE backend for scanners. simple-scan below is the GUI.
   hardware.sane.enable = true;
-  # The `net` backend probes for a saned server that is not running, adding a
-  # noticeable timeout to every simple-scan startup. Only the escl backend is used.
-  hardware.sane.disabledDefaultBackends = [ "net" ];
+  # Disable backends that probe the network for scanners we don't own. Each of
+  # these adds 0.3-2s to simple-scan startup while looking for Epson / Kodak /
+  # Canon / Konica devices via mDNS or broadcast. escl is enough for our HP.
+  hardware.sane.disabledDefaultBackends = [
+    "net"
+    "epsonds"
+    "epson2"
+    "kodakaio"
+    "magicolor"
+    "pixma"
+    "dell1600n_net"
+  ];
 
   # Pin the eSCL scanner (HP LaserJet Pro M148fdw at 192.168.1.33) so SANE
   # does not spend startup time on mDNS discovery over all backends.
