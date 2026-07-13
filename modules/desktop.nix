@@ -66,6 +66,13 @@ in {
     # retry-job retries failed print jobs instead of cancelling them (useful for flaky printers).
     extraConf = "ErrorPolicy retry-job";
   };
+
+  # SANE backend for scanners. simple-scan below is the GUI.
+  hardware.sane.enable = true;
+
+  fonts.packages = with pkgs; [
+    corefonts
+  ];
   services.avahi = {
     # Avahi implements mDNS/DNS-SD for local network service discovery (e.g. network printers).
     enable = true;
@@ -96,6 +103,7 @@ in {
     fuzzel
     kitty
     keepassxc
+    simple-scan
     obsidian
     typora
     libreoffice
