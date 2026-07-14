@@ -4,8 +4,8 @@
 
 {
   # npm global installs go to ~/.npm-global (nix store is read-only)
-  environment.sessionVariables.NPM_CONFIG_PREFIX = "$HOME/.npm-global";
-  environment.sessionVariables.PATH = [ "$HOME/.npm-global/bin" ];
+  environment.variables.NPM_CONFIG_PREFIX = "$HOME/.npm-global";
+  environment.variables.PATH = [ "$HOME/.npm-global/bin" ];
 
   # vim -> nvim alias for muscle memory (nixvim.nix sets EDITOR)
   environment.shellAliases.vim = "nvim";

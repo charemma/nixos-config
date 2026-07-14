@@ -10,6 +10,7 @@
   # and evaluates them together -- order does not matter.
   imports = [
     ../../modules/core.nix
+    ../../modules/syncthing-nixos.nix
     ../../modules/users.nix
   ];
 
