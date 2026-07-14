@@ -3,6 +3,7 @@
 {
   imports = [
     ../../modules/core.nix
+    ../../modules/syncthing-nixos.nix
     ../../modules/dev.nix
     ../../modules/nixvim.nix
     ../../modules/tailscale.nix
