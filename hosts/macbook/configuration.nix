@@ -42,11 +42,12 @@
   # NFS client: mount aiagent's ~/code at /code via macOS autofs.
   # Uses NFSv3 + resvport (macOS convention). all_squash on server maps every
   # incoming UID to charemma (1000), so access works regardless of local uid.
-  environment.etc."auto_master".text = ''
-    +auto_master
-    /home  auto_home  -nobrowse,hidefromfinder
-    /-  /etc/auto_code  --timeout=600
-  '';
+  #
+  # /etc/auto_master ships with macOS and already has meaningful content
+  # (auto_home, /Network/Servers, ...) -- nix-darwin refuses to overwrite
+  # unmanaged files outright, so instead of declaring environment.etc."auto_master"
+  # (which would claim ownership of the whole file), the activation script below
+  # just ensures our one extra direct-map line is present, leaving the rest alone.
   environment.etc."auto_code".text = ''
     /code  -resvport,soft,intr,timeo=30,retrans=2,vers=3  aiagent.tail48929d.ts.net:/home/charemma/code
   '';
@@ -56,6 +57,11 @@
   # to the Data volume (same trick nix-darwin uses for /run in modules/system/base.nix).
   system.activationScripts.nfsCodeMount = {
     text = ''
+      if ! grep -q '^/-[[:space:]]*/etc/auto_code' /etc/auto_master 2>/dev/null; then
+        echo "adding /etc/auto_code direct map to /etc/auto_master..."
+        printf '/-\t/etc/auto_code\t--timeout=600\n' | tee -a /etc/auto_master >/dev/null
+      fi
+
       if ! grep -q '^code\b' /etc/synthetic.conf 2>/dev/null; then
         echo "setting up /code via /etc/synthetic.conf..."
         printf 'code\n' | tee -a /etc/synthetic.conf >/dev/null
