@@ -10,6 +10,7 @@
       ./hardware-configuration.nix
       ../../modules/desktop.nix
       ../../modules/core.nix
+      ../../modules/syncthing-nixos.nix
       ../../modules/dev.nix
       ../../modules/nixvim.nix
       ../../modules/remote-desktop.nix

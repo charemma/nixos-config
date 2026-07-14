@@ -7,10 +7,15 @@
 {
   imports = [
     ../../modules/core.nix
+    ../../modules/syncthing-darwin.nix
     ../../modules/dev.nix
   ];
 
   networking.hostName = "macbook";
+
+  # Required since nix-darwin's multi-user migration -- user-scoped options
+  # (launchd.user.agents, homebrew, etc.) need to know which account they apply to.
+  system.primaryUser = "charemma";
 
   time.timeZone = "Europe/Athens";
 
@@ -46,10 +51,22 @@
     /code  -resvport,soft,intr,timeo=30,retrans=2,vers=3  aiagent.tail48929d.ts.net:/home/charemma/code
   '';
 
+  # /code does not exist at boot -- "/" is the sealed, read-only system volume
+  # since Catalina, so new top-level directories need a synthetic.conf firmlink
+  # to the Data volume (same trick nix-darwin uses for /run in modules/system/base.nix).
   system.activationScripts.nfsCodeMount = {
     text = ''
-      mkdir -p /code
-      /usr/sbin/automount -vc 2>/dev/null || true
+      if ! grep -q '^code\b' /etc/synthetic.conf 2>/dev/null; then
+        echo "setting up /code via /etc/synthetic.conf..."
+        printf 'code\n' | tee -a /etc/synthetic.conf >/dev/null
+        /System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util -t || true
+      fi
+
+      if [[ ! -d /code ]]; then
+        printf >&2 'error: /code firmlink did not appear, a reboot may be required\n'
+      else
+        /usr/sbin/automount -vc 2>/dev/null || true
+      fi
     '';
   };
 
