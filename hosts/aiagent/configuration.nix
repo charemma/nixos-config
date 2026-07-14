@@ -131,22 +131,20 @@
   # nixpkgs-rpi ships the motion package but not the NixOS module, so we wire
   # up the systemd service by hand.
 
-  # NFS server: export ~/code to all Tailscale peers (100.64.0.0/10 CGNAT range).
+  # NFS server: export /code to all Tailscale peers (100.64.0.0/10 CGNAT range).
   # all_squash maps every client UID to anonuid=1000 (charemma) so north (uid 1000)
   # and macbook (different uid) both write as charemma. tailscale0 is already in
   # trustedInterfaces so no extra firewall rules are needed.
   services.nfs.server = {
     enable = true;
     exports = ''
-      /home/charemma/code  100.64.0.0/10(rw,sync,no_subtree_check,all_squash,anonuid=1000,anongid=1000)
+      /code  100.64.0.0/10(rw,sync,no_subtree_check,all_squash,anonuid=1000,anongid=1000)
     '';
   };
 
   systemd.tmpfiles.rules = [
     "d /var/lib/motion 0755 charemma charemma -"
-    "d /home/charemma/code 0755 charemma charemma -"
-    # /code -> ~/code so aiagent itself uses the same path as the NFS clients
-    "L+ /code - - - - /home/charemma/code"
+    "d /code 0755 charemma charemma -"
   ];
 
   systemd.services.motion = let
