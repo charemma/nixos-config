@@ -26,6 +26,9 @@
   # -gnome VPN variants (libnma, gtk4, webkitgtk) which take an hour to build
   # under aarch64 emulation and are useless without a GUI. Tailscale handles VPN.
   networking.networkmanager.plugins = lib.mkForce [];
+  # nm-online times out during nixos-rebuild switch on headless hosts -- the check
+  # is not meaningful when we administer the box over SSH anyway.
+  systemd.services.NetworkManager-wait-online.enable = false;
   # Explicit nameservers so DNS works even if DHCP does not supply them or
   # tailscale runs with -DefaultRoute (only tailnet queries via 100.100.100.100).
   networking.nameservers = [ "1.1.1.1" "8.8.8.8" ];
