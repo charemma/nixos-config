@@ -57,6 +57,16 @@
   services.k3s-agent = {
     enable = true;
     serverHost = "vps.tail48929d.ts.net";
+    # Reserve this node for kitchen-local workloads only (particulate PM sensor,
+    # future USB peripherals). Everything else must run on the vps so power/net
+    # outages here don't take down web services or the alerting path itself.
+    # Pods without a matching toleration will not schedule; already-running pods
+    # without one will be evicted at next reconcile.
+    nodeTaints = [ "dedicated=home:NoSchedule" ];
+    nodeLabels = {
+      "sensor-type" = "particulate";
+      "location" = "kitchen";
+    };
   };
 
   hardware.bluetooth.enable = true;
