@@ -43,7 +43,7 @@
     /-  /etc/auto_code  --timeout=600
   '';
   environment.etc."auto_code".text = ''
-    /code  -resvport,soft,intr,timeo=30,retrans=2,vers=3  aiagent.tail48929d.ts.net:/home/charemma/code
+    /code  -resvport,soft,intr,timeo=30,retrans=2,vers=3  aiagent.tail48929d.ts.net:/code
   '';
 
   system.activationScripts.nfsCodeMount = {

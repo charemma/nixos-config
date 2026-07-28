@@ -78,7 +78,7 @@
   systemd.tmpfiles.rules = [ "d /code 0755 root root -" ];
 
   fileSystems."/code" = {
-    device = "aiagent.tail48929d.ts.net:/home/charemma/code";
+    device = "aiagent.tail48929d.ts.net:/code";
     fsType = "nfs4";
     options = [
       "_netdev"
