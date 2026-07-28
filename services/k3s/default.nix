@@ -41,8 +41,12 @@ in {
       # toString converts the list to a space-separated string of flags.
       # --tls-san adds the domain as a Subject Alternative Name to the k3s API cert,
       # so kubectl can connect via the domain name instead of only the IP.
+      # --flannel-iface pins Flannel's VXLAN VTEP to the Tailscale interface, matching
+      # services/k3s/agent.nix. Without this, the server advertises its default (public)
+      # interface as the VTEP endpoint, which agent nodes reachable only over Tailscale
+      # (like aiagent) can't route to -- breaks cross-node pod traffic in that direction.
       extraFlags = toString (
-        [ "--tls-san=${cfg.domain}" ]
+        [ "--tls-san=${cfg.domain}" "--flannel-iface=tailscale0" ]
         ++ map (san: "--tls-san=${san}") cfg.extraSANs
       );
     };
