@@ -181,6 +181,7 @@ in {
     fuzzel
     kitty
     keepassxc
+    ente-auth
     simple-scan
     ocrmypdf
     (tesseract.override { enableLanguages = [ "eng" "deu" "ell" ]; })
