@@ -16,6 +16,14 @@
 
   raspberry-pi-nix.board = "bcm2712";
 
+  # RPi5 kernel doesn't enable the memory cgroup controller by default --
+  # containerd (bundled in k3s) needs it and fails hard without it:
+  # "Error: failed to find memory cgroup (v2)". k3s-agent.service has been
+  # crash-looping on every boot since this host was set up as a result
+  # (found 2026-08-14, 231k+ restart attempts). Classic RPi gotcha, same
+  # fix as the well-known Raspbian workaround.
+  boot.kernelParams = [ "cgroup_memory=1" "cgroup_enable=memory" ];
+
   fileSystems."/" = {
     device = "/dev/disk/by-label/NIXOS_SD";
     fsType = "ext4";
