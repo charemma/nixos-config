@@ -69,15 +69,19 @@
   services.k3s-agent = {
     enable = true;
     serverHost = "vps.tail48929d.ts.net";
-    # Reserve this node for kitchen-local workloads only (particulate PM sensor,
-    # future USB peripherals). Everything else must run on the vps so power/net
-    # outages here don't take down web services or the alerting path itself.
-    # Pods without a matching toleration will not schedule; already-running pods
-    # without one will be evicted at next reconcile.
+    # Reserve this node for workloads that specifically need to run here
+    # (particulate PM sensor via USB, or jobscout-scanner for its
+    # residential IP -- login-based portal fetchers are less bot-suspicious
+    # from a home IP than the vps's datacenter IP). Everything else must
+    # run on the vps so power/net outages here don't take down web services
+    # or the alerting path itself. Pods without a matching toleration will
+    # not schedule; already-running pods without one will be evicted at
+    # next reconcile.
     nodeTaints = [ "dedicated=home:NoSchedule" ];
     nodeLabels = {
       "sensor-type" = "particulate";
       "location" = "kitchen";
+      "home-network" = "true";
     };
   };
 
