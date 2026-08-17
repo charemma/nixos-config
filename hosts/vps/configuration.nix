@@ -30,6 +30,17 @@
   time.timeZone = "Europe/Berlin";
   i18n.defaultLocale = "en_US.UTF-8";
 
+  # 4GB, no cushion for the box's own memory pressure -- 2026-08-17
+  # incident: k3s/kine (SQLite) queries stalled under memory pressure, cascading
+  # into lease-update failures, NodeNotReady flapping, and apiserver TLS
+  # handshake timeouts (even on loopback). No swap meant the kernel had no
+  # slack and thrashed instead. Declares the swapfile created live during
+  # the incident so it survives a rebuild/reboot.
+  swapDevices = [{
+    device = "/swapfile";
+    size = 4096;
+  }];
+
   # Options for the custom k3s service module in services/k3s.
   services.k3s-server = {
     enable = true;
