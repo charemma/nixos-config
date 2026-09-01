@@ -82,6 +82,10 @@
       "sensor-type" = "particulate";
       "location" = "kitchen";
       "home-network" = "true";
+      # Obsidian vault lives on this host (Syncthing) -- jobscout's
+      # obsidian-writer pins to it via nodeSelector, see
+      # jobscout/k8s/obsidian-writer-deployment.yaml
+      "vault-access" = "true";
     };
   };
 
