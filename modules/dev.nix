@@ -31,13 +31,14 @@
     tig
     yazi
 
-    # OpenClaw installed via npm (nix-openclaw packaging is broken).
-    # Run bootstrap-tools after first install or to update.
+    # opencode installed via npm so it stays current (the nixpkgs package
+    # trails upstream versions significantly). Run bootstrap-tools after
+    # first install or to update.
     (pkgs.writeShellScriptBin "bootstrap-tools" ''
       export NPM_CONFIG_PREFIX="''${NPM_CONFIG_PREFIX:-$HOME/.npm-global}"
       mkdir -p "$NPM_CONFIG_PREFIX"
       echo "Installing npm tools to $NPM_CONFIG_PREFIX..."
-      npm install -g openclaw@latest
+      npm install -g opencode-ai@latest
       echo "Done."
     '')
   ];

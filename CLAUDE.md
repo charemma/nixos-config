@@ -28,7 +28,7 @@ This repo is edited from multiple machines (north, macbook, aiagent). To avoid m
 - `nixpkgs-rpi` (pinned) is used for rpi5 and aiagent (raspberry-pi-nix compatibility)
 - Packages that need a newer version than nixpkgs-rpi provides are passed via `specialArgs` from current nixpkgs (e.g. nodejs-current, whisper-cpp-pkg, claude-code-pkg)
 - `claude-code-nix` flake provides always-up-to-date Claude Code on all hosts
-- OpenClaw is installed via npm (`bootstrap-tools`) because the nix-openclaw packaging is broken
+- opencode is installed via npm (`bootstrap-tools`) because the nixpkgs package trails upstream versions
 
 ## Deployment
 
