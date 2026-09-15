@@ -53,28 +53,43 @@
   '';
 
   # /code does not exist at boot -- "/" is the sealed, read-only system volume
-  # since Catalina, so new top-level directories need a synthetic.conf firmlink
-  # to the Data volume (same trick nix-darwin uses for /run in modules/system/base.nix).
-  system.activationScripts.nfsCodeMount = {
-    text = ''
+  # since Catalina. automountd always places autofs triggers for paths on the
+  # sealed volume under /System/Volumes/Data (Apple bridges this for /home with
+  # a firmlink, which only Apple can create). A bare "code" entry in
+  # synthetic.conf only creates an empty directory on the sealed volume -- the
+  # NFS mount then lands on /System/Volumes/Data/code while /code stays empty.
+  # The two-column form creates a synthetic symlink /code ->
+  # /System/Volumes/Data/code instead, reaching the actual autofs trigger
+  # (same trick nix-darwin uses for /run in modules/system/base.nix).
+  #
+  # Unlike NixOS, nix-darwin does NOT auto-run arbitrary
+  # system.activationScripts.<name> entries -- only a fixed hardcoded list
+  # (see nix-darwin's activation-scripts.nix) actually gets wired into the
+  # activation run. Custom logic has to hook into one of the three
+  # designated extension points (preActivation/extraActivation/postActivation).
+  system.activationScripts.postActivation.text = lib.mkAfter ''
       if ! grep -q '^/-[[:space:]]*/etc/auto_code' /etc/auto_master 2>/dev/null; then
         echo "adding /etc/auto_code direct map to /etc/auto_master..."
         printf '/-\t/etc/auto_code\t--timeout=600\n' | tee -a /etc/auto_master >/dev/null
       fi
 
-      if ! grep -q '^code\b' /etc/synthetic.conf 2>/dev/null; then
-        echo "setting up /code via /etc/synthetic.conf..."
-        printf 'code\n' | tee -a /etc/synthetic.conf >/dev/null
+      # migrate away from the old bare-directory entry
+      if grep -q '^code$' /etc/synthetic.conf 2>/dev/null; then
+        echo "removing bare code entry from /etc/synthetic.conf..."
+        sed -i "" '/^code$/d' /etc/synthetic.conf
+      fi
+
+      if ! grep -q '^code[[:space:]]' /etc/synthetic.conf 2>/dev/null; then
+        echo "setting up /code -> /System/Volumes/Data/code via /etc/synthetic.conf..."
+        printf 'code\tSystem/Volumes/Data/code\n' | tee -a /etc/synthetic.conf >/dev/null
         /System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util -t || true
       fi
 
-      if [[ ! -d /code ]]; then
-        printf >&2 'error: /code firmlink did not appear, a reboot may be required\n'
-      else
-        /usr/sbin/automount -vc 2>/dev/null || true
+      if [[ -e /code && ! -L /code ]]; then
+        printf >&2 'warning: /code is still a plain directory -- reboot required for the synthetic symlink to appear\n'
       fi
-    '';
-  };
+      /usr/sbin/automount -vc 2>/dev/null || true
+  '';
 
   # The version of nix-darwin this config was first set up with.
   # Integer format (6) instead of the NixOS string format ("26.05").
