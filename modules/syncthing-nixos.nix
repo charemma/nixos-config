@@ -12,6 +12,12 @@
     user = "charemma";
     dataDir = "/home/charemma";
     configDir = "/home/charemma/.config/syncthing";
-    openDefaultPorts = true;
+    # Peers are reached over the tailnet (all devices are in the Tailscale
+    # network), so listen ports are only opened on the Tailscale interface
+    # -- never on the public interface.
+    openDefaultPorts = false;
   };
+
+  networking.firewall.interfaces.tailscale0.allowedTCPPorts = [ 22000 ];
+  networking.firewall.interfaces.tailscale0.allowedUDPPorts = [ 21027 22000 ];
 }

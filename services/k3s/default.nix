@@ -51,8 +51,19 @@ in {
       );
     };
 
-    # k3s serves HTTP (for ACME HTTP-01 challenge), HTTPS, and the Kubernetes API.
-    networking.firewall.allowedTCPPorts = [ 80 443 6443 ];
+    # k3s serves HTTP (for ACME HTTP-01 challenge) and HTTPS publicly.
+    # The Kubernetes API (6443) is reachable ONLY via the Tailscale
+    # interface -- the cluster is admin-only and must not be public.
+    networking.firewall.allowedTCPPorts = [ 80 443 ];
+    networking.firewall.interfaces.tailscale0.allowedTCPPorts = [ 6443 ];
+    # Pods reach the API via the ClusterIP (10.43.0.1:443), which kube-proxy
+    # DNATs to <node-ip>:6443. For pods on this node that traffic enters via
+    # cni0, NOT tailscale0 -- without this rule the firewall drops it and
+    # every in-cluster API client (Traefik, ArgoCD, operators) breaks with
+    # i/o timeouts (2026-09-11 incident: all ingress routes gone, sites 404).
+    # Cross-node pod traffic arrives via tailscale0 (flannel VTEP is pinned
+    # there) and is already covered above.
+    networking.firewall.interfaces.cni0.allowedTCPPorts = [ 6443 ];
 
     # k3s bundles Traefik as the default ingress controller via a HelmChart resource.
     # This systemd oneshot service drops a HelmChartConfig into k3s's auto-deploy directory
