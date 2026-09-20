@@ -212,6 +212,7 @@ in {
     ocrmypdf
     (tesseract.override { enableLanguages = [ "eng" "deu" "ell" ]; })
     ocrScript
+    pdfarranger
     obsidian
     typora
     libreoffice
