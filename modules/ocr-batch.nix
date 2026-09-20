@@ -2,13 +2,17 @@
 #
 # simple-scan OCRs fresh scans on the fly via ocr-script (desktop.nix). PDFs that
 # arrive from other devices, phone scans or older batches have no text layer.
-# This timer walks the scanner inbox and OCRs every PDF without fonts in place.
+# A path unit watches the scanner inbox and runs the OCR pass whenever a file
+# lands there. A slow timer acts as a safety net for events the watcher missed
+# (reboot, file younger than the minimum age at trigger time).
 #
-# Enable it on exactly one host. Syncthing replicates the result to the others,
-# and two hosts OCRing the same file would produce sync conflicts.
+# Enable it on exactly one host that is always on (aiagent). Syncthing
+# replicates the result to the others, and two hosts OCRing the same file
+# would produce sync conflicts.
 #
 # Manual use: `ocr-batch --dry-run` lists what would be processed, `ocr-batch`
-# processes it. OCR_BATCH_DIR and OCR_BATCH_LANGS override the defaults.
+# processes it. OCR_BATCH_DIR, OCR_BATCH_LANGS and OCR_BATCH_MIN_AGE_MINUTES
+# override the defaults.
 { config, lib, pkgs, ... }:
 
 let
@@ -20,9 +24,10 @@ let
     text = ''
       dir="''${OCR_BATCH_DIR:-$HOME/Sync/Scanner}"
       langs="''${OCR_BATCH_LANGS:-deu+eng+ell}"
-      # Skip files touched recently: they may still be written by the scanner
-      # or in the middle of a Syncthing transfer.
-      min_age_minutes="''${OCR_BATCH_MIN_AGE_MINUTES:-5}"
+      # Skip files touched recently: they may still be written by a scanner
+      # on this host. Syncthing itself renames atomically, so on a pure
+      # receiver a minute is plenty.
+      min_age_minutes="''${OCR_BATCH_MIN_AGE_MINUTES:-1}"
       dry_run=false
       [[ "''${1:-}" == "--dry-run" ]] && dry_run=true
 
@@ -105,10 +110,16 @@ in {
       description = "Tesseract language string passed to ocrmypdf -l.";
     };
 
+    minAgeMinutes = lib.mkOption {
+      type = lib.types.ints.unsigned;
+      default = 1;
+      description = "Only process PDFs whose mtime is at least this many minutes old.";
+    };
+
     onCalendar = lib.mkOption {
       type = lib.types.str;
-      default = "hourly";
-      description = "systemd OnCalendar expression for the timer.";
+      default = "*:0/15";
+      description = "systemd OnCalendar expression for the safety-net timer. Default: every 15 minutes.";
     };
   };
 
@@ -120,6 +131,7 @@ in {
       environment = {
         OCR_BATCH_DIR = cfg.directory;
         OCR_BATCH_LANGS = cfg.languages;
+        OCR_BATCH_MIN_AGE_MINUTES = toString cfg.minAgeMinutes;
       };
       serviceConfig = {
         Type = "oneshot";
@@ -131,12 +143,23 @@ in {
       };
     };
 
+    # inotify on the inbox and the unbatched/ subfolder: fires when a file is
+    # closed after writing or moved in, which is how Syncthing delivers files.
+    # A file that is still too young at that moment is picked up by the timer.
+    systemd.paths.ocr-batch = {
+      wantedBy = [ "multi-user.target" ];
+      pathConfig = {
+        PathChanged = [ cfg.directory "${cfg.directory}/unbatched" ];
+        Unit = "ocr-batch.service";
+      };
+    };
+
     systemd.timers.ocr-batch = {
       wantedBy = [ "timers.target" ];
       timerConfig = {
         OnCalendar = cfg.onCalendar;
         Persistent = true;
-        RandomizedDelaySec = "5m";
+        RandomizedDelaySec = "2m";
       };
     };
   };

@@ -15,6 +15,7 @@
     ../../modules/nixvim.nix
     ../../modules/tailscale.nix
     ../../modules/monitoring.nix
+    ../../modules/ocr-batch.nix
     ../../services/k3s/agent.nix
     # Override tailscale with current version from nixpkgs-unstable
     # (nixpkgs-rpi ships an outdated 1.78.1)
@@ -22,6 +23,10 @@
   ];
 
   raspberry-pi-nix.board = "bcm2712";
+
+  # Option from modules/ocr-batch.nix -- OCR PDFs landing in the Syncthing scanner
+  # inbox. Runs here because aiagent is the only always-on host with the Sync folder.
+  services.ocr-batch.enable = true;
 
   # RPi5 kernel doesn't enable the memory cgroup controller by default --
   # containerd (bundled in k3s) needs it and fails hard without it:
