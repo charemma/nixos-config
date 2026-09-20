@@ -116,10 +116,21 @@ in {
 
   # SANE backend for scanners. simple-scan below is the GUI.
   hardware.sane.enable = true;
+
+  # Scan our HP M148fdw over eSCL via sane-airscan, not the sane-backends
+  # built-in "escl" backend. The built-in backend has long-standing bugs with
+  # HP ADF scanning: it starts a job but fails to trigger the feeder transport
+  # and aborts immediately without pulling a page. sane-airscan drives the same
+  # eSCL protocol reliably (it is what macOS-style AirScan clients use).
+  hardware.sane.extraBackends = [ pkgs.sane-airscan ];
+
   # Disable backends that probe the network for scanners we don't own. Each of
   # these adds 0.3-2s to simple-scan startup while looking for Epson / Kodak /
-  # Canon / Konica devices via mDNS or broadcast. escl is enough for our HP.
+  # Canon / Konica devices via mDNS or broadcast. Also disable the broken
+  # built-in "escl" backend so simple-scan sees only the airscan device (no
+  # duplicate entries, no chance of picking the backend that aborts on ADF).
   hardware.sane.disabledDefaultBackends = [
+    "escl"
     "net"
     "epsonds"
     "epson2"
@@ -129,10 +140,15 @@ in {
     "dell1600n_net"
   ];
 
-  # Pin the eSCL scanner (HP LaserJet Pro M148fdw at 192.168.1.33) so SANE
-  # does not spend startup time on mDNS discovery over all backends.
-  environment.etc."sane.d/escl.conf".text = ''
-    https://192.168.1.33:443
+  # Pin the eSCL scanner (HP LaserJet Pro M148fdw at 192.168.1.33) and disable
+  # mDNS discovery so simple-scan does not spend startup time probing the
+  # network. The manual device entry uses the eSCL protocol on the known URL.
+  environment.etc."sane.d/airscan.conf".text = ''
+    [devices]
+    "HP LaserJet Pro M148fdw" = https://192.168.1.33:443/eSCL, eSCL
+
+    [options]
+    discovery = disable
   '';
 
   fonts.packages = with pkgs; [
