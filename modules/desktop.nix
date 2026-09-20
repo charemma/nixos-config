@@ -114,6 +114,16 @@ in {
     ensureDefaultPrinter = "HP-M148fdw";
   };
 
+  # dconf provides the GSettings backend GTK apps need to persist settings.
+  # Without it, GSettings falls back to the memory backend and the GTK file
+  # chooser (rendered by xdg-desktop-portal-gtk) cannot remember its window
+  # size: every dialog opens at the portal default and re-imposes that size a
+  # second after opening, once the folder listing loads, discarding any manual
+  # resize. With dconf enabled the dialog remembers and reopens at the last
+  # size, so it no longer snaps back. Under i3 (no GNOME) this is not pulled in
+  # automatically, so enable it explicitly.
+  programs.dconf.enable = true;
+
   # SANE backend for scanners. simple-scan below is the GUI.
   hardware.sane.enable = true;
 
