@@ -20,7 +20,7 @@ let
 
   ocrBatch = pkgs.writeShellApplication {
     name = "ocr-batch";
-    runtimeInputs = with pkgs; [ ocrmypdf poppler-utils findutils coreutils util-linux ];
+    runtimeInputs = with pkgs; [ ocrmypdf poppler_utils findutils coreutils util-linux ];
     text = ''
       dir="''${OCR_BATCH_DIR:-$HOME/Sync/Scanner}"
       langs="''${OCR_BATCH_LANGS:-deu+eng+ell}"
