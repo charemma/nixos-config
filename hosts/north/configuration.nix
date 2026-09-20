@@ -18,10 +18,15 @@
       ../../modules/tailscale.nix
       ../../modules/monitoring.nix
       ../../modules/users.nix
+      ../../modules/ocr-batch.nix
     ];
 
   # Option from modules/users.nix -- extends the charemma user's groups for this host.
   charemma.extraGroups = [ "networkmanager" "video" "audio" ];
+
+  # Option from modules/ocr-batch.nix -- OCR the Syncthing scanner inbox once an hour.
+  # Only north runs this, the other devices receive the result via Syncthing.
+  services.ocr-batch.enable = true;
 
   # Register aarch64-linux as an emulated system via QEMU binfmt_misc.
   # Allows running and building aarch64 binaries natively on x86_64.
