@@ -17,6 +17,7 @@
       ../../modules/infosec.nix
       ../../modules/tailscale.nix
       ../../modules/monitoring.nix
+      ../../modules/mutagen-code.nix
       ../../modules/users.nix
     ];
 
@@ -73,24 +74,8 @@
   # MAC: 10:7c:61:45:d8:99
   networking.interfaces."eno1".wakeOnLan.enable = true;
 
-  # NFS client: mount aiagent's ~/code at /code.
-  # x-systemd.automount defers the actual mount until first access and survives
-  # aiagent being temporarily unreachable (soft + timeout prevent hard hangs).
-  systemd.tmpfiles.rules = [ "d /code 0755 root root -" ];
-
-  fileSystems."/code" = {
-    device = "aiagent.tail48929d.ts.net:/code";
-    fsType = "nfs4";
-    options = [
-      "_netdev"
-      "noauto"
-      "x-systemd.automount"
-      "x-systemd.idle-timeout=600"
-      "soft"
-      "timeo=30"
-      "retrans=2"
-    ];
-  };
+  # /code is synced from the aiagent hub via Mutagen (see modules/mutagen-code.nix),
+  # replacing the former NFS mount.
 
   system.stateVersion = "26.05";
 }
