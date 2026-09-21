@@ -3,16 +3,16 @@
 # nix-darwin has no systemd, so the daemon runs as a launchd user agent (same
 # pattern as syncthing-darwin.nix). Replaces the former NFS autofs mount.
 #
-# macOS quirk: the root volume is sealed/read-only, so /code cannot be a plain
-# directory. The sync target is a real directory on the Data volume
-# (/Users/charemma/code); /code is exposed as a firmlink to it via
-# synthetic.conf (same trick the old NFS setup used). The firmlink only appears
-# after a reboot, but the sync itself works immediately against the real path.
+# /code must be a REAL directory (not a symlink): Node resolves symlinks in
+# process.cwd(), so a symlinked /code would make Claude session paths differ
+# from the other hosts. The single-name synthetic.conf entry ("code", no tab
+# target) creates a real, writable directory on the Data volume that appears at
+# the canonical path /code -- so realpath(/code) stays /code, matching north's
+# bind mount. The data lives directly at /code; ~/code is never used.
 { lib, pkgs, ... }:
 let
   common = import ./mutagen-code-common.nix;
   mutagen = "${pkgs.mutagen}/bin/mutagen";
-  localCode = "/Users/charemma/code";
   binPath = "${pkgs.mutagen}/bin:${pkgs.openssh}/bin:/usr/bin:/bin";
   ignoreArgs = lib.concatMapStringsSep " " (p: "--ignore=${p}") common.ignores;
 
@@ -27,27 +27,39 @@ let
         --name=${common.sessionName} \
         --sync-mode=two-way-safe \
         ${ignoreArgs} \
-        ${localCode} ${common.hubEndpoint} || true
+        /code ${common.hubEndpoint} || true
     fi
   '';
 in
 {
   environment.systemPackages = [ pkgs.mutagen ];
 
-  # Back /code with a writable dir on the Data volume and expose it at /code via
-  # a synthetic.conf firmlink. Migrates any prior plain "code" entry (the old
-  # NFS mountpoint) to the firmlink form.
+  # Ensure /code is the real-dir firmlink form, and tear down the old NFS autofs
+  # direct map that used to mount on /code. These edit config files that take
+  # effect on the next boot; ownership is fixed up at boot by the daemon below.
   system.activationScripts.mutagenCode.text = ''
-    mkdir -p ${localCode}
-    chown charemma:staff ${localCode}
-    if ! grep -q 'Users/charemma/code' /etc/synthetic.conf 2>/dev/null; then
-      echo "setting up /code firmlink via /etc/synthetic.conf..."
+    if ! grep -q '^code$' /etc/synthetic.conf 2>/dev/null; then
       grep -v '^code' /etc/synthetic.conf 2>/dev/null > /etc/synthetic.conf.tmp || true
-      mv /etc/synthetic.conf.tmp /etc/synthetic.conf
-      printf 'code\tUsers/charemma/code\n' >> /etc/synthetic.conf
+      mv /etc/synthetic.conf.tmp /etc/synthetic.conf 2>/dev/null || true
+      printf 'code\n' >> /etc/synthetic.conf
       /System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util -t || true
     fi
+    if grep -q '/etc/auto_code' /etc/auto_master 2>/dev/null; then
+      grep -v '/etc/auto_code' /etc/auto_master > /etc/auto_master.tmp || true
+      mv /etc/auto_master.tmp /etc/auto_master
+      /usr/sbin/automount -vc 2>/dev/null || true
+    fi
   '';
+
+  # Runs as root at boot: /code (real Data-volume dir) is created root-owned, so
+  # hand it to charemma before the user's mutagen agent tries to write it.
+  launchd.daemons.mutagen-code-prepare = {
+    script = ''
+      /bin/mkdir -p /code
+      /usr/sbin/chown charemma:staff /code
+    '';
+    serviceConfig.RunAtLoad = true;
+  };
 
   launchd.user.agents.mutagen-code-daemon = {
     command = "${mutagen} daemon run";
