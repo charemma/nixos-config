@@ -35,14 +35,16 @@ in
 {
   environment.systemPackages = [ pkgs.mutagen ];
 
-  # Local, writable /code (replaces the former NFS mount).
-  systemd.tmpfiles.rules = [ "d /code 0755 charemma charemma -" ];
+  # /code itself is provided by the importing host (e.g. north bind-mounts it
+  # from the roomy /home disk); the sync only needs it to exist and be mounted.
 
   systemd.services.mutagen-code = {
     description = "Mutagen sync of /code against the aiagent hub";
     wantedBy = [ "multi-user.target" ];
     after = [ "network-online.target" ];
     wants = [ "network-online.target" ];
+    # Wait for /code (possibly a bind mount) before starting the sync.
+    unitConfig.RequiresMountsFor = "/code";
     # ssh is the transport mutagen uses to reach the hub.
     path = [ pkgs.openssh ];
     serviceConfig = {
