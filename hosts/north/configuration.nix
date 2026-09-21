@@ -75,7 +75,16 @@
   networking.interfaces."eno1".wakeOnLan.enable = true;
 
   # /code is synced from the aiagent hub via Mutagen (see modules/mutagen-code.nix),
-  # replacing the former NFS mount.
+  # replacing the former NFS mount. The data lives on the roomy /home disk (root
+  # is small and nearly full) and is bind-mounted to the canonical /code path, so
+  # /code is identical across all hosts (Claude session paths must match). Backed
+  # by /home/code (not ~/code, which still holds the old pre-move checkout).
+  systemd.tmpfiles.rules = [ "d /home/code 0755 charemma charemma -" ];
+  fileSystems."/code" = {
+    device = "/home/code";
+    fsType = "none";
+    options = [ "bind" ];
+  };
 
   system.stateVersion = "26.05";
 }
