@@ -22,7 +22,7 @@
     { services.tailscale.package = tailscale-pkg; }
   ];
 
-  raspberry-pi-nix.board = "bcm2712";
+  # Board/bootloader/firmware come from nixos-raspberrypi's raspberry-pi-5.base.
 
   # RPi5 kernel doesn't enable the memory cgroup controller by default --
   # containerd (bundled in k3s) needs it and fails hard without it:
