@@ -14,7 +14,6 @@
     ../../modules/syncthing-nixos.nix
     ../../modules/dev.nix
     ../../modules/nixvim.nix
-    ../../modules/desktop-wm.nix
     ../../modules/tailscale.nix
     ../../modules/monitoring.nix
     ../../services/k3s/agent.nix
@@ -174,18 +173,6 @@
   systemd.tmpfiles.rules = [
     "d /code 0755 charemma charemma -"
   ];
-
-  # Headless graphical console for the JetKVM: X11 + i3 come from desktop-wm.nix;
-  # here charemma is auto-logged straight into i3 (no login screen, since the box
-  # is only ever reached through the KVM).
-  services.displayManager = {
-    autoLogin = {
-      enable = true;
-      user = "charemma";
-    };
-    defaultSession = "none+i3";
-  };
-  services.xserver.displayManager.lightdm.enable = true;
 
   system.stateVersion = "26.05";
 }
