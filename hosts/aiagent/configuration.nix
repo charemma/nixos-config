@@ -10,6 +10,7 @@
 {
   imports = [
     ../../modules/core.nix
+    ../../modules/networking-resilience.nix
     ../../modules/syncthing-nixos.nix
     ../../modules/dev.nix
     ../../modules/nixvim.nix
