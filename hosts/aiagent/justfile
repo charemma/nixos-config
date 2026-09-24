@@ -5,9 +5,11 @@ _root := `git rev-parse --show-toplevel`
 _default:
     @just --list
 
-# build sd card image
+_build := _root + "#nixosConfigurations.aiagent.config.system.build"
+
+# build sd card image (remote builders push their results to the cache themselves)
 build:
-    nix build -o "{{ _root }}/results/aiagent" "{{ _root }}#nixosConfigurations.aiagent.config.system.build.sdImage" --builders "$(just _builders)"
+    nix build -o "{{ _root }}/results/aiagent" "{{ _build }}.sdImage" --builders "$(just _builders)"
 
 # flash sd card image to device (usage: just aiagent::flash /dev/sdX)
 flash device:
@@ -18,7 +20,7 @@ flash device:
 deploy:
     #!/usr/bin/env bash
     set -euo pipefail
-    toplevel=$(nix build "{{ _root }}#nixosConfigurations.aiagent.config.system.build.toplevel" --no-link --print-out-paths)
+    toplevel=$(nix build "{{ _build }}.toplevel" --no-link --print-out-paths)
     nix copy --to ssh://root@aiagent "$toplevel" --no-check-sigs
     ssh root@aiagent "nix-env -p /nix/var/nix/profiles/system --set $toplevel && $toplevel/bin/switch-to-configuration switch"
 

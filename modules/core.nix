@@ -6,6 +6,8 @@
 { config, lib, pkgs, ... }:
 
 {
+  imports = [ ./binary-cache.nix ];
+
   services.openssh.enable = true;
 
   programs.vim.enable = true;
