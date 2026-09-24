@@ -1,6 +1,15 @@
 {
   description = "System configurations";
 
+  # Binary cache for the RPi5 kernel/firmware bundles from nixos-raspberrypi,
+  # so we do not build them from scratch.
+  nixConfig = {
+    extra-substituters = [ "https://nixos-raspberrypi.cachix.org" ];
+    extra-trusted-public-keys = [
+      "nixos-raspberrypi.cachix.org-1:4iMO9LXa8BqhU+Rpg6LQKiGa2lsNh/j2oiYLNOQ5sPI="
+    ];
+  };
+
   inputs = {
     # The main nixpkgs channel. unstable means rolling releases, not unstable software.
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -24,8 +33,14 @@
     nixpkgs-rpi.url = "github:NixOS/nixpkgs/cbd8ec4de4469333c82ff40d057350c30e9f7d36";
 
     # NixOS support for Raspberry Pi (kernel, firmware, board config).
+    # raspberry-pi-nix was archived in March 2025 and is stuck on nixos-24.11;
+    # rpi5 still uses it until migrated. aiagent uses the maintained successor.
     raspberry-pi-nix.url = "github:nix-community/raspberry-pi-nix";
     raspberry-pi-nix.inputs.nixpkgs.follows = "nixpkgs-rpi";
+
+    # Actively maintained RPi5 support with matched kernel+firmware bundles and a
+    # binary cache, tracking current nixpkgs. Replaces the archived raspberry-pi-nix.
+    nixos-raspberrypi.url = "github:nvmd/nixos-raspberrypi/main";
 
     # Personal fork of the xdg-desktop-portal-termfilechooser portal.
     termfilechooser.url = "github:charemma/xdg-desktop-portal-termfilechooser";
@@ -43,7 +58,7 @@
 
   # outputs is a function that receives all inputs and returns an attribute set.
   # The `self` argument refers to this flake itself (useful for referencing its own outputs).
-  outputs = { self, nixpkgs, nixpkgs-rpi, nix-darwin, disko, nixos-hardware, raspberry-pi-nix, termfilechooser, anker, claude-code-nix, nixvim, ... }:
+  outputs = { self, nixpkgs, nixpkgs-rpi, nix-darwin, disko, nixos-hardware, raspberry-pi-nix, nixos-raspberrypi, termfilechooser, anker, claude-code-nix, nixvim, ... }:
   let
     # Helper to produce one attribute per supported system without repeating the list.
     # Used for devShells which need to work on all platforms.
@@ -114,27 +129,30 @@
         ];
       };
 
-      aiagent = nixpkgs-rpi.lib.nixosSystem {
-        system = "aarch64-linux";
+      # aiagent runs current nixpkgs via nixos-raspberrypi (matched RPi5
+      # kernel+firmware). The old nixpkgs-rpi overlays are gone: the base is now
+      # recent, so bat/gh/prettier come from it directly. k3s stays pinned to the
+      # nixpkgs input so the agent matches vps's k3s-server version.
+      aiagent = nixos-raspberrypi.lib.nixosSystem {
         specialArgs = {
           inherit anker claude-code-nix;
-          # packages from current nixpkgs (nixpkgs-rpi versions are too old)
           whisper-cpp-pkg = nixpkgs.legacyPackages.aarch64-linux.whisper-cpp;
           tailscale-pkg = nixpkgs.legacyPackages.aarch64-linux.tailscale;
         };
         modules = [
+          {
+            imports = with nixos-raspberrypi.nixosModules; [
+              raspberry-pi-5.base
+              raspberry-pi-5.display-vc4
+              # Provides config.system.build.sdImage with the RPi kernel
+              # bootloader (not generic-extlinux). Required to build the
+              # flashable SD image; without it the generic nixpkgs sd-card
+              # image conflicts on system.build.installBootLoader.
+              sd-image
+            ];
+          }
           nixvim.nixosModules.nixvim
-          raspberry-pi-nix.nixosModules.raspberry-pi
-          raspberry-pi-nix.nixosModules.sd-image
-          # Replace selected packages with current nixpkgs versions
           { nixpkgs.overlays = [( final: prev: {
-            bat = nixpkgs.legacyPackages.aarch64-linux.bat;
-            gh = nixpkgs.legacyPackages.aarch64-linux.gh;
-            # nixvim.nix references top-level prettier which only exists in
-            # the newer nixpkgs (nixpkgs-rpi still has it under nodePackages).
-            prettier = nixpkgs.legacyPackages.aarch64-linux.prettier;
-            # Pin k3s to unstable's version so aiagent's k3s-agent matches vps's k3s-server
-            # (nixpkgs-rpi ships k3s 1.31, unstable ships 1.35+, gap breaks worker-server compatibility).
             k3s = nixpkgs.legacyPackages.aarch64-linux.k3s;
           })]; }
           ./hosts/aiagent/configuration.nix

@@ -5,7 +5,11 @@
 {
   # npm global installs go to ~/.npm-global (nix store is read-only)
   environment.variables.NPM_CONFIG_PREFIX = "$HOME/.npm-global";
-  environment.variables.PATH = [ "$HOME/.npm-global/bin" ];
+  # On NixOS this list gets merged into PATH; nix-darwin has no such merge and
+  # would OVERWRITE the whole PATH (wiping /bin, /usr/bin, nix paths) -- which
+  # breaks every shell. macOS shells get ~/.npm-global/bin from the dotfiles, so
+  # only set this off darwin.
+  environment.variables.PATH = lib.mkIf (!pkgs.stdenv.isDarwin) [ "$HOME/.npm-global/bin" ];
 
   # vim -> nvim alias for muscle memory (nixvim.nix sets EDITOR)
   environment.shellAliases.vim = "nvim";

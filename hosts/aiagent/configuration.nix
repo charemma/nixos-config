@@ -10,6 +10,7 @@
 {
   imports = [
     ../../modules/core.nix
+    ../../modules/networking-resilience.nix
     ../../modules/syncthing-nixos.nix
     ../../modules/dev.nix
     ../../modules/nixvim.nix
@@ -22,7 +23,7 @@
     { services.tailscale.package = tailscale-pkg; }
   ];
 
-  raspberry-pi-nix.board = "bcm2712";
+  # Board/bootloader/firmware come from nixos-raspberrypi's raspberry-pi-5.base.
 
   # Option from modules/ocr-batch.nix -- OCR PDFs landing in the Syncthing scanner
   # inbox. Runs here because aiagent is the only always-on host with the Sync folder.
@@ -167,19 +168,13 @@
     whisper-cpp-pkg
     ffmpeg
     lsof
+    mutagen # this host is the /code sync hub; spokes reach it over SSH
   ];
 
-  # NFS server: export /code to all Tailscale peers (100.64.0.0/10 CGNAT range).
-  # all_squash maps every client UID to anonuid=1000 (charemma) so north (uid 1000)
-  # and macbook (different uid) both write as charemma. tailscale0 is already in
-  # trustedInterfaces so no extra firewall rules are needed.
-  services.nfs.server = {
-    enable = true;
-    exports = ''
-      /code  100.64.0.0/10(rw,sync,no_subtree_check,all_squash,anonuid=1000,anongid=1000)
-    '';
-  };
-
+  # aiagent is the Mutagen sync hub: it holds the canonical /code, and north and
+  # macbook sync against it over SSH (see modules/mutagen-code.nix). No daemon is
+  # needed here -- the spokes' daemons deploy the mutagen agent over SSH. This dir
+  # is the source of truth, so it must exist.
   systemd.tmpfiles.rules = [
     "d /code 0755 charemma charemma -"
   ];

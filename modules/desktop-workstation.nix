@@ -1,4 +1,6 @@
-# desktop.nix -- X11 desktop environment for north (i3 + SDDM)
+# desktop-workstation.nix -- full workstation desktop layered on the shared
+# graphical base (desktop-wm.nix): SDDM login + theme, printing, scanning, XDG
+# portals, application fonts and GUI apps. north imports both this and desktop-wm.
 #
 # termfilechooser is a flake input (not in nixpkgs), so it must be passed as an argument.
 # The `let` block extracts the package for the current system once so we can reuse it.
@@ -41,18 +43,7 @@ let
     '';
   };
 in {
-  services.xserver = {
-    # Enable the X11 display server.
-    enable = true;
-    # Use i3 as the window manager (started by the display manager after login).
-    windowManager.i3.enable = true;
-    xkb = {
-      # Two keyboard layouts available: US and Greek.
-      layout = "us,gr";
-      # alt+space cycles between the two layouts.
-      options = "grp:alt_space_toggle";
-    };
-  };
+  # X11, i3 and the keyboard layout come from desktop-wm.nix (shared base).
 
   services.displayManager.sddm = {
     # SDDM is the login screen / display manager that launches the X session.
@@ -186,9 +177,8 @@ in {
   };
 
   services.libinput = {
-    # libinput is the input device driver for mice and touchpads.
-    enable = true;
-    # Natural scrolling: content moves in the direction your fingers move (macOS style).
+    # libinput itself is enabled in desktop-wm.nix; here we add only the
+    # workstation's natural-scrolling preference.
     mouse.naturalScrolling = true;
     touchpad.naturalScrolling = true;
   };
@@ -205,7 +195,6 @@ in {
     xkb-switch-i3
     xclip
     fuzzel
-    kitty
     keepassxc
     ente-auth
     simple-scan
@@ -224,9 +213,6 @@ in {
     caffeine-ng
     pavucontrol
     pulseaudio
-    # polybar.override replaces the default derivation attributes.
-    # pulseSupport = true compiles polybar with PulseAudio support for the volume module.
-    (polybar.override { pulseSupport = true; })
     rofi
     xterm
     # overrideAttrs patches the build phase of the SDDM theme to inject our wallpaper.
