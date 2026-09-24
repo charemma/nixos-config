@@ -144,6 +144,11 @@
             imports = with nixos-raspberrypi.nixosModules; [
               raspberry-pi-5.base
               raspberry-pi-5.display-vc4
+              # Provides config.system.build.sdImage with the RPi kernel
+              # bootloader (not generic-extlinux). Required to build the
+              # flashable SD image; without it the generic nixpkgs sd-card
+              # image conflicts on system.build.installBootLoader.
+              sd-image
             ];
           }
           nixvim.nixosModules.nixvim
