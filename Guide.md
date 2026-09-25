@@ -20,13 +20,13 @@ All rebuild commands require sudo and operate via `nixos-rebuild --flake .#<host
 
 ## Architecture
 
-Flake-based NixOS config on nixpkgs unstable. Flake inputs: nixpkgs, disko, charemma-web, nixos-hardware, and raspberry-pi-nix.
+Flake-based NixOS config on nixpkgs unstable. Flake inputs: nixpkgs, disko, nixos-hardware, nixos-raspberrypi and a few personal flakes (see flake.nix).
 
 **Hosts:**
 - `north` (x86_64) -- build workstation, imports core, desktop, remote-access, infosec
 - `framework` (x86_64) -- Framework Laptop 12, portable pentest machine, imports core, desktop, remote-access, infosec, laptop. Uses nixos-hardware for firmware/fingerprint
 - `vps` (x86_64) -- VPS for charemma.de, Caddy web server, imports core + remote-access. Site content pulled from charemma-web flake input. Uses qemu-guest profile
-- `rpi5` (aarch64) -- headless Raspberry Pi 5 server, imports core + remote-access only
+- `aiagent` (aarch64) -- Raspberry Pi 5, k3s agent node and mutagen/Syncthing hub
 
 **Host configs** (`hosts/<name>/configuration.nix`) own: bootloader, networking, locale, user account, and select which modules to import.
 
@@ -37,7 +37,7 @@ Flake-based NixOS config on nixpkgs unstable. Flake inputs: nixpkgs, disko, char
 - `infosec.nix` -- security/pentest tooling (nmap, metasploit, hashcat, burpsuite, etc.)
 - `laptop.nix` -- power management (TLP), backlight, lid switch, battery thresholds, touchpad
 
-Adding a new host: create `hosts/<name>/configuration.nix` (+ `hardware-configuration.nix` for physical machines), add entry to `flake.nix` nixosConfigurations, then `just rebuild <name>`. The rpi5 host uses raspberry-pi-nix for kernel/bootloader/firmware and can be cross-built from x86 with binfmt emulation. The framework host uses nixos-hardware for Framework-specific firmware, fingerprint, and power profiles. The vps host uses the qemu-guest profile for KVM virtualization.
+Adding a new host: create `hosts/<name>/configuration.nix` (+ `hardware-configuration.nix` for physical machines), add entry to `flake.nix` nixosConfigurations, then `just rebuild <name>`.
 
 ## Related Repos
 

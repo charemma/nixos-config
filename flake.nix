@@ -28,18 +28,8 @@
 
     # Hardware-specific NixOS modules (kernel params, drivers) for common devices.
     nixos-hardware.url = "github:NixOS/nixos-hardware";
-    # Pinned to a nixpkgs rev compatible with raspberry-pi-nix.
-    # Newer nixpkgs-unstable introduced images.nix which conflicts with rpi-nix's extlinux bootloader.
-    nixpkgs-rpi.url = "github:NixOS/nixpkgs/cbd8ec4de4469333c82ff40d057350c30e9f7d36";
-
-    # NixOS support for Raspberry Pi (kernel, firmware, board config).
-    # raspberry-pi-nix was archived in March 2025 and is stuck on nixos-24.11;
-    # rpi5 still uses it until migrated. aiagent uses the maintained successor.
-    raspberry-pi-nix.url = "github:nix-community/raspberry-pi-nix";
-    raspberry-pi-nix.inputs.nixpkgs.follows = "nixpkgs-rpi";
-
     # Actively maintained RPi5 support with matched kernel+firmware bundles and a
-    # binary cache, tracking current nixpkgs. Replaces the archived raspberry-pi-nix.
+    # binary cache, tracking current nixpkgs.
     nixos-raspberrypi.url = "github:nvmd/nixos-raspberrypi/main";
 
     # Personal fork of the xdg-desktop-portal-termfilechooser portal.
@@ -58,7 +48,7 @@
 
   # outputs is a function that receives all inputs and returns an attribute set.
   # The `self` argument refers to this flake itself (useful for referencing its own outputs).
-  outputs = { self, nixpkgs, nixpkgs-rpi, nix-darwin, disko, nixos-hardware, raspberry-pi-nix, nixos-raspberrypi, termfilechooser, anker, claude-code-nix, nixvim, ... }:
+  outputs = { self, nixpkgs, nix-darwin, disko, nixos-hardware, nixos-raspberrypi, termfilechooser, anker, claude-code-nix, nixvim, ... }:
   let
     # Helper to produce one attribute per supported system without repeating the list.
     # Used for devShells which need to work on all platforms.
@@ -114,30 +104,14 @@
         ];
       };
 
-      rpi5 = nixpkgs-rpi.lib.nixosSystem {
-        system = "aarch64-linux";
-        modules = [
-          # Provides the raspberry-pi-nix.board option and all RPi-specific config.
-          raspberry-pi-nix.nixosModules.raspberry-pi
-          raspberry-pi-nix.nixosModules.sd-image
-          # Replace selected packages with current nixpkgs versions
-          # (nixpkgs-rpi is pinned and ships outdated versions)
-          { nixpkgs.overlays = [( final: prev: {
-            gh = nixpkgs.legacyPackages.aarch64-linux.gh;
-          })]; }
-          ./hosts/rpi5/configuration.nix
-        ];
-      };
 
       # aiagent runs current nixpkgs via nixos-raspberrypi (matched RPi5
-      # kernel+firmware). The old nixpkgs-rpi overlays are gone: the base is now
-      # recent, so bat/gh/prettier come from it directly. k3s stays pinned to the
-      # nixpkgs input so the agent matches vps's k3s-server version.
+      # kernel+firmware). k3s stays pinned to the nixpkgs input so the agent
+      # matches vps's k3s-server version.
       aiagent = nixos-raspberrypi.lib.nixosSystem {
         specialArgs = {
           inherit anker claude-code-nix;
           whisper-cpp-pkg = nixpkgs.legacyPackages.aarch64-linux.whisper-cpp;
-          tailscale-pkg = nixpkgs.legacyPackages.aarch64-linux.tailscale;
         };
         modules = [
           {

@@ -3,7 +3,6 @@
   lib,
   pkgs,
   whisper-cpp-pkg,
-  tailscale-pkg,
   ...
 }:
 
@@ -18,9 +17,6 @@
     ../../modules/monitoring.nix
     ../../modules/ocr-batch.nix
     ../../services/k3s/agent.nix
-    # Override tailscale with current version from nixpkgs-unstable
-    # (nixpkgs-rpi ships an outdated 1.78.1)
-    { services.tailscale.package = tailscale-pkg; }
   ];
 
   # Board/bootloader/firmware come from nixos-raspberrypi's raspberry-pi-5.base.

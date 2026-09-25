@@ -27,7 +27,7 @@ All actual configuration stays here, `nixos-rebuild` just follows the redirect.
 | `north` | x86_64 | NixOS | Build workstation -- full desktop (niri/i3), infosec tooling |
 | `macbook` | aarch64 | nix-darwin | MacBook -- dev machine |
 | `vps` | x86_64 | NixOS | VPS for charemma.de -- k3s with Traefik |
-| `rpi5` | aarch64 | NixOS | Headless Raspberry Pi 5 server |
+| `aiagent` | aarch64 | NixOS | Raspberry Pi 5 -- k3s agent node, mutagen/Syncthing hub |
 
 ## Modules
 
@@ -58,7 +58,7 @@ Everything goes through the justfile:
 ```
 just switch [host]         rebuild and switch (auto-detects darwin/nixos)
 just deploy                deploy vps NixOS config to charemma.de
-just build-rpi5            build rpi5 sd card image
+just aiagent::build        build the aiagent sd card image
 just push [cache]          push build result to binary cache
 just push-system [host]    push full system closure to cache
 just update                update flake inputs
@@ -82,21 +82,17 @@ See [infra](https://github.com/charemma/infra) for bootstrap instructions.
 
 ## Building the RPi5 image
 
-The rpi5 configuration targets aarch64-linux. To build an SD card image from an
-x86_64 host, enable binfmt emulation:
-
-```nix
-# in your x86 host config (e.g. hosts/north/configuration.nix)
-boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
-```
-
-Then build the image:
+The aiagent configuration targets aarch64-linux and builds on nixos-raspberrypi.
+Build the SD card image on a remote aarch64 builder (see `just _builders` and
+platform/infra/nix-builder), then flash and verify:
 
 ```
-just build-rpi5
+just aiagent::build
+just aiagent::flash /dev/sdX
 ```
 
-Flash the resulting image to an SD card with `dd` or your tool of choice.
+Flash with `oflag=direct` and compare the card against the image afterwards;
+cached writes through a flaky USB card reader can silently corrupt the copy.
 
 ## Related
 

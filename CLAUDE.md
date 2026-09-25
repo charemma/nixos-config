@@ -2,7 +2,7 @@
 
 ## What this is
 
-NixOS system configurations for all personal hosts: north (workstation), macbook (laptop), vps (Hetzner), rpi5, aiagent (RPi5 AI assistant). Managed as a Nix flake with modular configs under `modules/` and per-host configs under `hosts/`.
+NixOS system configurations for all personal hosts: north (workstation), macbook (laptop), vps (Hetzner), aiagent (RPi5 k3s node). Managed as a Nix flake with modular configs under `modules/` and per-host configs under `hosts/`.
 
 ## Git workflow for this repo
 
@@ -25,8 +25,8 @@ This repo is edited from multiple machines (north, macbook, aiagent). To avoid m
 ## Key patterns
 
 - `nixpkgs` (unstable) is used for north, macbook, vps
-- `nixpkgs-rpi` (pinned) is used for rpi5 and aiagent (raspberry-pi-nix compatibility)
-- Packages that need a newer version than nixpkgs-rpi provides are passed via `specialArgs` from current nixpkgs (e.g. nodejs-current, whisper-cpp-pkg, claude-code-pkg)
+- aiagent builds on current `nixpkgs` via `nixos-raspberrypi` (matched RPi5 kernel and firmware, own binary cache)
+- aiagent gets a few packages via `specialArgs` (whisper-cpp-pkg, claude-code-nix, anker); k3s is pinned to the `nixpkgs` input so agent and vps server match
 - `claude-code-nix` flake provides always-up-to-date Claude Code on all hosts
 - OpenClaw is installed via npm (`bootstrap-tools`) because the nix-openclaw packaging is broken
 
