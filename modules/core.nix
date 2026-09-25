@@ -8,6 +8,17 @@
 {
   imports = [ ./binary-cache.nix ];
 
+  # Weekly garbage collection. north's root filled up during a deploy because
+  # the store had never been collected (42 GB of dead paths). Keep a month of
+  # generations so a rollback stays possible; the schedule option differs
+  # between NixOS (dates) and nix-darwin (interval).
+  nix.gc = {
+    automatic = true;
+    options = "--delete-older-than 30d";
+  } // (if pkgs.stdenv.isDarwin
+    then { interval = { Weekday = 0; Hour = 4; Minute = 0; }; }
+    else { dates = "weekly"; });
+
   services.openssh.enable = true;
 
   programs.vim.enable = true;
