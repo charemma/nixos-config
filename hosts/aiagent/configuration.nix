@@ -61,9 +61,6 @@
     "8.8.8.8"
   ];
 
-  # enable /etc/hosts editing
-  environment.etc.hosts.enable = false;
-
   # Disable wifi radio while a wired link is up, re-enable when it drops.
   # Credentials are entered once on the device:
   #   nmcli device wifi connect <SSID> password <PWD>
