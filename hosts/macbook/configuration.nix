@@ -10,6 +10,7 @@
     ../../modules/syncthing-darwin.nix
     ../../modules/mutagen-code-darwin.nix
     ../../modules/dev.nix
+    ../../modules/mitmproxy-ca.nix
   ];
 
   networking.hostName = "macbook";

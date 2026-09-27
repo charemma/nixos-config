@@ -17,6 +17,7 @@
       ../../modules/nixvim.nix
       ../../modules/remote-desktop.nix
       ../../modules/infosec.nix
+      ../../modules/mitmproxy-ca.nix
       ../../modules/tailscale.nix
       ../../modules/monitoring.nix
       ../../modules/mutagen-code.nix
