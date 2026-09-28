@@ -1,6 +1,8 @@
 # dev.nix -- developer tools for workstations (north, macbook)
-# anker and claude-code-nix are flake inputs, passed in via specialArgs in flake.nix
-{ config, lib, pkgs, anker, claude-code-nix, ... }:
+# anker is a flake input, passed in via specialArgs in flake.nix.
+# Claude Code is installed via its self-updating binary (~/.local/bin/claude),
+# not through Nix, so it always tracks the latest release.
+{ config, lib, pkgs, anker, ... }:
 
 {
   # npm global installs go to ~/.npm-global (nix store is read-only)
@@ -16,7 +18,6 @@
 
   environment.systemPackages = with pkgs; [
     anker.packages.${pkgs.system}.default
-    claude-code-nix.packages.${pkgs.system}.default
     bat
     direnv
     fastfetch
@@ -35,14 +36,16 @@
     tig
     yazi
 
-    # OpenClaw installed via npm (nix-openclaw packaging is broken).
-    # Run bootstrap-tools after first install or to update.
+    # Claude Code comes from the official native installer, not from Nix: it
+    # updates itself on the `latest` channel, so new models work the day they
+    # ship. Run once on a fresh host; afterwards the binary keeps itself current.
     (pkgs.writeShellScriptBin "bootstrap-tools" ''
-      export NPM_CONFIG_PREFIX="''${NPM_CONFIG_PREFIX:-$HOME/.npm-global}"
-      mkdir -p "$NPM_CONFIG_PREFIX"
-      echo "Installing npm tools to $NPM_CONFIG_PREFIX..."
-      npm install -g openclaw@latest
-      echo "Done."
+      set -eu
+      if [ -x "$HOME/.local/bin/claude" ]; then
+        echo "claude already installed: $("$HOME/.local/bin/claude" --version)"
+      else
+        ${pkgs.curl}/bin/curl -fsSL https://claude.ai/install.sh | ${pkgs.bash}/bin/bash
+      fi
     '')
   ];
 }

@@ -39,8 +39,6 @@
     # Workday recap CLI tool (personal project).
     anker.url = "github:charemma/anker";
     anker.inputs.nixpkgs.follows = "nixpkgs";
-    claude-code-nix.url = "github:sadjow/claude-code-nix";
-    claude-code-nix.inputs.nixpkgs.follows = "nixpkgs";
 
     # NixVim: declarative neovim configuration via Nix modules.
     nixvim.url = "github:nix-community/nixvim";
@@ -48,7 +46,7 @@
 
   # outputs is a function that receives all inputs and returns an attribute set.
   # The `self` argument refers to this flake itself (useful for referencing its own outputs).
-  outputs = { self, nixpkgs, nix-darwin, disko, nixos-hardware, nixos-raspberrypi, termfilechooser, anker, claude-code-nix, nixvim, ... }:
+  outputs = { self, nixpkgs, nix-darwin, disko, nixos-hardware, nixos-raspberrypi, termfilechooser, anker, nixvim, ... }:
   let
     # Helper to produce one attribute per supported system without repeating the list.
     # Used for devShells which need to work on all platforms.
@@ -75,7 +73,7 @@
     darwinConfigurations = {
       macbook = nix-darwin.lib.darwinSystem {
         system = "aarch64-darwin";
-        specialArgs = { inherit anker claude-code-nix; };
+        specialArgs = { inherit anker; };
         modules = [
           ./hosts/macbook/configuration.nix
         ];
@@ -88,7 +86,7 @@
         system = "x86_64-linux";
         # Flake inputs that modules need directly.
         # inherit is shorthand for termfilechooser = termfilechooser; anker = anker;
-        specialArgs = { inherit termfilechooser anker claude-code-nix; };
+        specialArgs = { inherit termfilechooser anker; };
         modules = [
           nixvim.nixosModules.nixvim
           ./hosts/north/configuration.nix
@@ -110,7 +108,7 @@
       # matches vps's k3s-server version.
       aiagent = nixos-raspberrypi.lib.nixosSystem {
         specialArgs = {
-          inherit anker claude-code-nix;
+          inherit anker;
           whisper-cpp-pkg = nixpkgs.legacyPackages.aarch64-linux.whisper-cpp;
         };
         modules = [

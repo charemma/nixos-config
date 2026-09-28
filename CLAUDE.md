@@ -26,9 +26,9 @@ This repo is edited from multiple machines (north, macbook, aiagent). To avoid m
 
 - `nixpkgs` (unstable) is used for north, macbook, vps
 - aiagent builds on current `nixpkgs` via `nixos-raspberrypi` (matched RPi5 kernel and firmware, own binary cache)
-- aiagent gets a few packages via `specialArgs` (whisper-cpp-pkg, claude-code-nix, anker); k3s is pinned to the `nixpkgs` input so agent and vps server match
-- `claude-code-nix` flake provides always-up-to-date Claude Code on all hosts
-- OpenClaw is installed via npm (`bootstrap-tools`) because the nix-openclaw packaging is broken
+- aiagent gets a few packages via `specialArgs` (whisper-cpp-pkg, anker); k3s is pinned to the `nixpkgs` input so agent and vps server match
+- Claude Code is installed via the official native installer (`bootstrap-tools`), not through Nix, so it self-updates to the latest release
+- OpenClaw is not installed anymore; see issue #35 for bringing it back as a module
 
 ## Deployment
 
