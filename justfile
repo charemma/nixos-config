@@ -5,6 +5,7 @@ mod north 'hosts/north/justfile'
 mod mac 'hosts/macbook/justfile'
 mod vps 'hosts/vps/justfile'
 mod aiagent 'hosts/aiagent/justfile'
+mod wake 'justfiles/wake.just'
 
 # internal: use NIX_BUILDERS if set, otherwise fall back to local linux-builder
 _builders:

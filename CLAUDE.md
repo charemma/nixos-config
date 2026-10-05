@@ -39,6 +39,7 @@ just vps::deploy         # deploy to VPS over SSH
 just aiagent::deploy     # deploy to aiagent RPi over SSH (nix copy as root)
 just aiagent::build      # build SD card image (remote builder or binfmt)
 just aiagent::flash      # flash SD card image to device
+just wake::north         # wake north via Wake-on-LAN (run from a host on the home LAN)
 ```
 
 ## Build strategy for aarch64 (RPi) images
