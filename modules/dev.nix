@@ -24,6 +24,7 @@
     fd
     fzf
     gh
+    glab
     git
     glow
     jq
