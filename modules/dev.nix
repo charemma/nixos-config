@@ -35,6 +35,7 @@
     nodejs
     ripgrep
     tig
+    uv
     yazi
 
     # Claude Code comes from the official native installer, not from Nix: it
