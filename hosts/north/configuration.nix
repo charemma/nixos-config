@@ -14,6 +14,7 @@
       ../../modules/networking-resilience.nix
       ../../modules/syncthing-nixos.nix
       ../../modules/dev.nix
+      ../../modules/docker.nix
       ../../modules/nixvim.nix
       ../../modules/remote-desktop.nix
       ../../modules/infosec.nix
