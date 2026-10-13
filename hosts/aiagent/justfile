@@ -26,4 +26,4 @@ deploy:
 
 # rebuild and switch to new NixOS configuration (run on the Pi itself)
 rebuild:
-    sudo nixos-rebuild switch --flake "{{ _root }}#aiagent"
+    sudo nixos-rebuild switch --flake "{{ _root }}#aiagent" --max-jobs 1 --cores 3
