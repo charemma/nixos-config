@@ -11,3 +11,6 @@ rebuild:
 # stage configuration for next boot (use when switch is blocked, e.g. dbus impl change)
 boot:
     sudo nixos-rebuild boot --flake "$(git rev-parse --show-toplevel)#north"
+
+wol:
+    ssh aiagent wakeonlan 10:7c:61:45:d8:99

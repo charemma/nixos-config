@@ -15,6 +15,7 @@
     ../../modules/nixvim.nix
     ../../modules/tailscale.nix
     ../../modules/monitoring.nix
+    ../../modules/pentest.nix
     ../../services/k3s/agent.nix
     # Override tailscale with current version from nixpkgs-unstable
     # (nixpkgs-rpi ships an outdated 1.78.1)
