@@ -43,6 +43,7 @@
     htop
     jq
     mitmproxy
+    mpv
     python3
     ripgrep
     starship
