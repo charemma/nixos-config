@@ -47,6 +47,8 @@
     domain = "charemma.de";
     acmeEmail = "me@charemma.de";
     extraSANs = [ "vps.tail48929d.ts.net" ];
+    # HSTS on all public sites; Middleware lives in platform gitops/manifests/traefik-middlewares
+    websecureMiddlewares = [ "kube-system-hsts@kubernetescrd" ];
   };
 
   # bash is enabled so the root user (which defaults to bash) has a functional shell.

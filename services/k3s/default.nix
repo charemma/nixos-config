@@ -8,6 +8,14 @@ let
   # Convention: store the module's own options under a short name `cfg`
   # so you don't have to write config.services.k3s-server.xyz everywhere.
   cfg = config.services.k3s-server;
+
+  # Traefik CLI arguments, rendered one per line into the HelmChartConfig.
+  traefikArgs = [
+    "--certificatesresolvers.letsencrypt.acme.email=${cfg.acmeEmail}"
+    "--certificatesresolvers.letsencrypt.acme.storage=/data/acme.json"
+    "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
+  ] ++ lib.optional (cfg.websecureMiddlewares != [ ])
+    "--entrypoints.websecure.http.middlewares=${lib.concatStringsSep "," cfg.websecureMiddlewares}";
 in {
   # Declare the options this module exposes. Other modules (or hosts) set these.
   options.services.k3s-server = {
@@ -29,6 +37,17 @@ in {
     acmeEmail = lib.mkOption {
       type = lib.types.str;
       description = "Email for Let's Encrypt certificate notifications.";
+    };
+
+    websecureMiddlewares = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [];
+      example = [ "kube-system-hsts@kubernetescrd" ];
+      description = ''
+        Traefik middlewares applied to every route on the websecure (HTTPS)
+        entrypoint, e.g. HSTS. The Middleware resources must exist in the
+        cluster before this is deployed, otherwise all websecure routes fail.
+      '';
     };
   };
 
@@ -92,9 +111,7 @@ in {
           spec:
             valuesContent: |-
               additionalArguments:
-                - "--certificatesresolvers.letsencrypt.acme.email=${cfg.acmeEmail}"
-                - "--certificatesresolvers.letsencrypt.acme.storage=/data/acme.json"
-                - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
+                ${lib.concatMapStringsSep "\n      " (arg: "- \"${arg}\"") traefikArgs}
         ''} /var/lib/rancher/k3s/server/manifests/traefik-config.yaml
       '';
     };
