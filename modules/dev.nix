@@ -1,4 +1,4 @@
-# dev.nix -- developer tools for workstations (north, macbook)
+# dev.nix -- developer tools for workstations (north, macbook, aiagent)
 # anker is a flake input, passed in via specialArgs in flake.nix.
 # Claude Code is installed via its self-updating binary (~/.local/bin/claude),
 # not through Nix, so it always tracks the latest release.
@@ -49,5 +49,8 @@
         ${pkgs.curl}/bin/curl -fsSL https://claude.ai/install.sh | ${pkgs.bash}/bin/bash
       fi
     '')
-  ];
+  ]
+  # Codex CLI (standalone installer, not Nix) uses bubblewrap for its Linux
+  # sandbox. Linux-only, so skip it on the macbook.
+  ++ lib.optionals pkgs.stdenv.isLinux [ pkgs.bubblewrap ];
 }
