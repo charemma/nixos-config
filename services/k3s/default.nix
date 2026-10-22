@@ -112,6 +112,27 @@ in {
             valuesContent: |-
               additionalArguments:
                 ${lib.concatMapStringsSep "\n      " (arg: "- \"${arg}\"") traefikArgs}
+              # Bind 80/443 on the node via hostPort instead of a LoadBalancer
+              # Service. ServiceLB (klipper-lb) MASQUERADEs every connection,
+              # even with externalTrafficPolicy: Local, so apps behind Traefik
+              # only saw 10.42.x instead of the client IP. hostPort binds all
+              # interfaces, so public and tailnet traffic both still reach it.
+              ports:
+                web:
+                  hostPort: 80
+                websecure:
+                  hostPort: 443
+              service:
+                type: ClusterIP
+              # hostPort only works on this node (the only public one).
+              nodeSelector:
+                kubernetes.io/hostname: ${config.networking.hostName}
+              # The new pod cannot start while the old one holds the host
+              # ports, so replace instead of surge (short downtime on update).
+              updateStrategy:
+                rollingUpdate:
+                  maxUnavailable: 1
+                  maxSurge: 0
         ''} /var/lib/rancher/k3s/server/manifests/traefik-config.yaml
       '';
     };
