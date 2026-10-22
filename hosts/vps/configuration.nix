@@ -49,6 +49,9 @@
     extraSANs = [ "vps.tail48929d.ts.net" ];
     # HSTS on all public sites; Middleware lives in platform gitops/manifests/traefik-middlewares
     websecureMiddlewares = [ "kube-system-hsts@kubernetescrd" ];
+    # charemma.de, security, ai and zeddl are proxied by Cloudflare; trust its
+    # X-Forwarded-For so logs and apps see visitors instead of Cloudflare edges.
+    trustedProxies = import ../../services/k3s/cloudflare-ips.nix;
   };
 
   # bash is enabled so the root user (which defaults to bash) has a functional shell.

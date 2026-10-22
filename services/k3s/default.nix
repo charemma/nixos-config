@@ -15,7 +15,15 @@ let
     "--certificatesresolvers.letsencrypt.acme.storage=/data/acme.json"
     "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
   ] ++ lib.optional (cfg.websecureMiddlewares != [ ])
-    "--entrypoints.websecure.http.middlewares=${lib.concatStringsSep "," cfg.websecureMiddlewares}";
+    "--entrypoints.websecure.http.middlewares=${lib.concatStringsSep "," cfg.websecureMiddlewares}"
+  ++ lib.optionals (cfg.trustedProxies != [ ]) (map
+    (ep: "--entrypoints.${ep}.forwardedHeaders.trustedIPs=${lib.concatStringsSep "," cfg.trustedProxies}")
+    [ "web" "websecure" ]);
+
+  # Request headers kept in the access log, everything else is dropped.
+  # CF-Connecting-IP is the reliable visitor IP behind Cloudflare; the
+  # X-Forwarded-For chain can start with a value the client made up.
+  accessLogHeaders = [ "User-Agent" "Referer" "CF-Connecting-IP" "X-Forwarded-For" ];
 in {
   # Declare the options this module exposes. Other modules (or hosts) set these.
   options.services.k3s-server = {
@@ -47,6 +55,17 @@ in {
         Traefik middlewares applied to every route on the websecure (HTTPS)
         entrypoint, e.g. HSTS. The Middleware resources must exist in the
         cluster before this is deployed, otherwise all websecure routes fail.
+      '';
+    };
+
+    trustedProxies = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [];
+      example = lib.literalExpression "import ./cloudflare-ips.nix";
+      description = ''
+        CIDRs whose X-Forwarded-* headers Traefik keeps (e.g. a CDN in front
+        of some hosts). Requests from anywhere else get these headers
+        stripped, so clients cannot spoof their IP.
       '';
     };
   };
@@ -133,6 +152,17 @@ in {
                 rollingUpdate:
                   maxUnavailable: 1
                   maxSurge: 0
+              # JSON access log on stdout, for visitor analysis and spotting
+              # scans. Retention is whatever kubelet log rotation keeps.
+              logs:
+                access:
+                  enabled: true
+                  format: json
+                  fields:
+                    headers:
+                      defaultmode: drop
+                      names:
+                        ${lib.concatMapStringsSep "\n              " (h: "${h}: keep") accessLogHeaders}
         ''} /var/lib/rancher/k3s/server/manifests/traefik-config.yaml
       '';
     };
