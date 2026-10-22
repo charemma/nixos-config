@@ -15,6 +15,7 @@
       ../../modules/syncthing-nixos.nix
       ../../modules/dev.nix
       ../../modules/docker.nix
+      ../../modules/libvirt.nix
       ../../modules/nixvim.nix
       ../../modules/remote-desktop.nix
       ../../modules/infosec.nix
