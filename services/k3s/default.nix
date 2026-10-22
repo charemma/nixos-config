@@ -24,6 +24,17 @@ let
   # CF-Connecting-IP is the reliable visitor IP behind Cloudflare; the
   # X-Forwarded-For chain can start with a value the client made up.
   accessLogHeaders = [ "User-Agent" "Referer" "CF-Connecting-IP" "X-Forwarded-For" ];
+
+  accessLogDir = "/var/log/traefik";
+  dashboard = import ./traefik-access-dashboard.nix { inherit lib; logDir = accessLogDir; };
+  # JSON is valid YAML, so the sidecar values can be inlined as flow mappings.
+  # Continuation lines are indented to match valuesContent in the YAML below.
+  dashboardValues = lib.optionalString cfg.accessLogDashboard (lib.concatStringsSep "\n    " [
+    "deployment:"
+    "  additionalContainers: ${builtins.toJSON dashboard.containers}"
+    "  additionalVolumes: ${builtins.toJSON dashboard.volumes}"
+    "additionalVolumeMounts: ${builtins.toJSON dashboard.volumeMounts}"
+  ]);
 in {
   # Declare the options this module exposes. Other modules (or hosts) set these.
   options.services.k3s-server = {
@@ -68,6 +79,12 @@ in {
         stripped, so clients cannot spoof their IP.
       '';
     };
+
+    accessLogDashboard = lib.mkEnableOption ''
+      a GoAccess dashboard for the Traefik access log, as sidecars in the
+      Traefik pod (see traefik-access-dashboard.nix). Reach it with
+      `kubectl -n kube-system port-forward deploy/traefik 8090 7890`
+    '';
   };
 
   # lib.mkIf makes the entire config block conditional.
@@ -158,11 +175,13 @@ in {
                 access:
                   enabled: true
                   format: json
+                  ${lib.optionalString cfg.accessLogDashboard "filePath: ${accessLogDir}/access.log"}
                   fields:
                     headers:
                       defaultmode: drop
                       names:
                         ${lib.concatMapStringsSep "\n              " (h: "${h}: keep") accessLogHeaders}
+              ${dashboardValues}
         ''} /var/lib/rancher/k3s/server/manifests/traefik-config.yaml
       '';
     };

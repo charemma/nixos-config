@@ -52,6 +52,8 @@
     # charemma.de, security, ai and zeddl are proxied by Cloudflare; trust its
     # X-Forwarded-For so logs and apps see visitors instead of Cloudflare edges.
     trustedProxies = import ../../services/k3s/cloudflare-ips.nix;
+    # GoAccess dashboard for the access log, port-forward only (tailnet API).
+    accessLogDashboard = true;
   };
 
   # bash is enabled so the root user (which defaults to bash) has a functional shell.
