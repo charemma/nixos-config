@@ -6,3 +6,54 @@ _default:
 # deploy vps config to charemma.de (builds remotely)
 deploy:
     nix shell 'nixpkgs#nixos-rebuild' -c nixos-rebuild switch --flake "$(git rev-parse --show-toplevel)#vps" --target-host charemma@charemma.de --build-host charemma@charemma.de --sudo
+
+# The PVC spec must match services/k3s/default.nix. Run once, right before the
+# deploy that enables persistent ACME storage (#41), so the switch does not
+# request every certificate again.
+# copy the running Traefik's acme.json into the traefik-acme PVC
+seed-acme:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    ns=kube-system
+    kubectl -n $ns apply -f - <<YAML
+    apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      name: traefik-acme
+    spec:
+      accessModes: [ReadWriteOnce]
+      storageClassName: local-path
+      resources:
+        requests:
+          storage: 128Mi
+    ---
+    # local-path binds the volume to the node of its first pod: must be vps.
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: traefik-acme-seed
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: vps
+      restartPolicy: Never
+      securityContext:
+        runAsUser: 65532
+        runAsGroup: 65532
+        runAsNonRoot: true
+      containers:
+        - name: seed
+          image: busybox:1.37.0
+          command: [sleep, "600"]
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: traefik-acme
+    YAML
+    kubectl -n $ns wait --for=condition=Ready pod/traefik-acme-seed --timeout=180s
+    kubectl -n $ns exec deploy/traefik -c traefik -- cat /data/acme.json \
+        | kubectl -n $ns exec -i traefik-acme-seed -- sh -c 'umask 077 && cat > /data/acme.json'
+    kubectl -n $ns exec traefik-acme-seed -- ls -ln /data
+    kubectl -n $ns delete pod traefik-acme-seed

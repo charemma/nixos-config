@@ -25,6 +25,10 @@ let
   # X-Forwarded-For chain can start with a value the client made up.
   accessLogHeaders = [ "User-Agent" "Referer" "CF-Connecting-IP" "X-Forwarded-For" ];
 
+  # PVC for /data (acme.json). Created by us, not by the chart, so it can be
+  # seeded before Traefik first mounts it (hosts/vps/justfile seed-acme).
+  acmeClaim = "traefik-acme";
+
   accessLogDir = "/var/log/traefik";
   dashboard = import ./traefik-access-dashboard.nix { inherit lib; logDir = accessLogDir; };
   # JSON is valid YAML, so the sidecar values can be inlined as flow mappings.
@@ -139,6 +143,22 @@ in {
       # The ${...} interpolations inject the runtime option values into the YAML.
       script = ''
         cp ${pkgs.writeText "traefik-config.yaml" ''
+          # Keeps acme.json across Traefik restarts. With the chart default
+          # (emptyDir) every restart re-requested all certificates and ran
+          # into Let's Encrypt's 5-per-week limit. local-path, so it lives on
+          # this node, where Traefik is pinned anyway.
+          apiVersion: v1
+          kind: PersistentVolumeClaim
+          metadata:
+            name: ${acmeClaim}
+            namespace: kube-system
+          spec:
+            accessModes: [ReadWriteOnce]
+            storageClassName: local-path
+            resources:
+              requests:
+                storage: 128Mi
+          ---
           apiVersion: helm.cattle.io/v1
           kind: HelmChartConfig
           metadata:
@@ -169,6 +189,9 @@ in {
                 rollingUpdate:
                   maxUnavailable: 1
                   maxSurge: 0
+              persistence:
+                enabled: true
+                existingClaim: ${acmeClaim}
               # JSON access log on stdout, for visitor analysis and spotting
               # scans. Retention is whatever kubelet log rotation keeps.
               logs:
