@@ -19,6 +19,7 @@
       ../../modules/nixvim.nix
       ../../modules/remote-desktop.nix
       ../../modules/infosec.nix
+      ../../modules/pentest.nix
       ../../modules/mitmproxy-ca.nix
       ../../modules/tailscale.nix
       ../../modules/monitoring.nix
