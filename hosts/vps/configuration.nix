@@ -46,6 +46,12 @@
     enable = true;
     domain = "charemma.de";
     acmeEmail = "me@charemma.de";
+    # TLS-ALPN-01 cannot pass Cloudflare's proxy (#42). The token Secret is
+    # seeded by platform infra/k8s-init (config cloudflareDnsToken).
+    acmeDnsChallenge = {
+      provider = "cloudflare";
+      credentialsSecret = "traefik-acme-dns";
+    };
     extraSANs = [ "vps.tail48929d.ts.net" ];
     # HSTS on all public sites; Middleware lives in platform gitops/manifests/traefik-middlewares
     websecureMiddlewares = [ "kube-system-hsts@kubernetescrd" ];

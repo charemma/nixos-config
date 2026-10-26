@@ -8,13 +8,18 @@ let
   # Convention: store the module's own options under a short name `cfg`
   # so you don't have to write config.services.k3s-server.xyz everywhere.
   cfg = config.services.k3s-server;
+  dns = cfg.acmeDnsChallenge;
 
   # Traefik CLI arguments, rendered one per line into the HelmChartConfig.
   traefikArgs = [
     "--certificatesresolvers.letsencrypt.acme.email=${cfg.acmeEmail}"
     "--certificatesresolvers.letsencrypt.acme.storage=/data/acme.json"
+  ] ++ (if dns == null then [
     "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
-  ] ++ lib.optional (cfg.websecureMiddlewares != [ ])
+  ] else [
+    "--certificatesresolvers.letsencrypt.acme.dnschallenge.provider=${dns.provider}"
+    "--certificatesresolvers.letsencrypt.acme.dnschallenge.resolvers=${lib.concatStringsSep "," dns.resolvers}"
+  ]) ++ lib.optional (cfg.websecureMiddlewares != [ ])
     "--entrypoints.websecure.http.middlewares=${lib.concatStringsSep "," cfg.websecureMiddlewares}"
   ++ lib.optionals (cfg.trustedProxies != [ ]) (map
     (ep: "--entrypoints.${ep}.forwardedHeaders.trustedIPs=${lib.concatStringsSep "," cfg.trustedProxies}")
@@ -39,6 +44,10 @@ let
     "  additionalVolumes: ${builtins.toJSON dashboard.volumes}"
     "additionalVolumeMounts: ${builtins.toJSON dashboard.volumeMounts}"
   ]);
+  # Provider credentials as env vars. optional, so a missing Secret only
+  # breaks new certificates instead of keeping Traefik from starting.
+  dnsCredentialValues = lib.optionalString (dns != null)
+    "envFrom: ${builtins.toJSON [ { secretRef = { name = dns.credentialsSecret; optional = true; }; } ]}";
 in {
   # Declare the options this module exposes. Other modules (or hosts) set these.
   options.services.k3s-server = {
@@ -60,6 +69,38 @@ in {
     acmeEmail = lib.mkOption {
       type = lib.types.str;
       description = "Email for Let's Encrypt certificate notifications.";
+    };
+
+    acmeDnsChallenge = lib.mkOption {
+      type = lib.types.nullOr (lib.types.submodule {
+        options = {
+          provider = lib.mkOption {
+            type = lib.types.str;
+            example = "cloudflare";
+            description = "lego DNS provider name, see https://go-acme.github.io/lego/dns/.";
+          };
+          credentialsSecret = lib.mkOption {
+            type = lib.types.str;
+            example = "traefik-acme-dns";
+            description = ''
+              Secret in kube-system whose keys become Traefik env vars, e.g.
+              CF_DNS_API_TOKEN for cloudflare. Created outside this module
+              (charemma/platform infra/k8s-init).
+            '';
+          };
+          resolvers = lib.mkOption {
+            type = lib.types.listOf lib.types.str;
+            default = [ "1.1.1.1:53" "1.0.0.1:53" ];
+            description = "DNS servers used to check that the challenge record has propagated.";
+          };
+        };
+      });
+      default = null;
+      description = ''
+        Use the DNS-01 challenge instead of TLS-ALPN-01. Needed for hosts
+        behind a TLS-terminating proxy like Cloudflare, where TLS-ALPN-01
+        never reaches Traefik. null keeps TLS-ALPN-01.
+      '';
     };
 
     websecureMiddlewares = lib.mkOption {
@@ -205,6 +246,7 @@ in {
                       names:
                         ${lib.concatMapStringsSep "\n              " (h: "${h}: keep") accessLogHeaders}
               ${dashboardValues}
+              ${dnsCredentialValues}
         ''} /var/lib/rancher/k3s/server/manifests/traefik-config.yaml
       '';
     };
