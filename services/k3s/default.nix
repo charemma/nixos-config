@@ -25,8 +25,8 @@ let
   # X-Forwarded-For chain can start with a value the client made up.
   accessLogHeaders = [ "User-Agent" "Referer" "CF-Connecting-IP" "X-Forwarded-For" ];
 
-  # PVC for /data (acme.json). Created by us, not by the chart, so it can be
-  # seeded before Traefik first mounts it (hosts/vps/justfile seed-acme).
+  # PVC for /data (acme.json). Created by us, not by the chart, so it was
+  # seeded with the existing certificates before Traefik first mounted it (#41).
   acmeClaim = "traefik-acme";
 
   accessLogDir = "/var/log/traefik";
