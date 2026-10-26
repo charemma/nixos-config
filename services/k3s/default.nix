@@ -151,7 +151,7 @@ in {
       );
     };
 
-    # k3s serves HTTP (for ACME HTTP-01 challenge) and HTTPS publicly.
+    # k3s serves HTTP (redirect to HTTPS only) and HTTPS publicly.
     # The Kubernetes API (6443) is reachable ONLY via the Tailscale
     # interface -- the cluster is admin-only and must not be public.
     networking.firewall.allowedTCPPorts = [ 80 443 ];
@@ -217,6 +217,15 @@ in {
               ports:
                 web:
                   hostPort: 80
+                  # No route serves plain HTTP, so send everything to HTTPS
+                  # instead of a 404. ACME does not need port 80 (DNS-01 or
+                  # TLS-ALPN-01).
+                  http:
+                    redirections:
+                      entryPoint:
+                        to: websecure
+                        scheme: https
+                        permanent: true
                 websecure:
                   hostPort: 443
               service:
