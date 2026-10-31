@@ -25,5 +25,7 @@
     "__pycache__/"
     "result"
     "result-*"
+    # per-host symlinks into the nix store (absolute targets cannot be synced)
+    "seclists"
   ];
 }
