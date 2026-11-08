@@ -14,6 +14,7 @@
       ../../modules/networking-resilience.nix
       ../../modules/syncthing-nixos.nix
       ../../modules/dev.nix
+      ../../modules/music.nix
       ../../modules/docker.nix
       ../../modules/libvirt.nix
       ../../modules/nixvim.nix

@@ -42,11 +42,16 @@
 
     # NixVim: declarative neovim configuration via Nix modules.
     nixvim.url = "github:nix-community/nixvim";
+
+    # Second nixos-unstable, locked independently of the main nixpkgs input.
+    # Lets single packages track a newer revision without bumping the whole
+    # system (and k3s on vps/aiagent). Bump with `nix flake update nixpkgs-latest`.
+    nixpkgs-latest.url = "github:NixOS/nixpkgs/nixos-unstable";
   };
 
   # outputs is a function that receives all inputs and returns an attribute set.
   # The `self` argument refers to this flake itself (useful for referencing its own outputs).
-  outputs = { self, nixpkgs, nix-darwin, disko, nixos-hardware, nixos-raspberrypi, termfilechooser, anker, nixvim, ... }:
+  outputs = { self, nixpkgs, nix-darwin, disko, nixos-hardware, nixos-raspberrypi, termfilechooser, anker, nixvim, nixpkgs-latest, ... }:
   let
     # Helper to produce one attribute per supported system without repeating the list.
     # Used for devShells which need to work on all platforms.
@@ -73,7 +78,7 @@
     darwinConfigurations = {
       macbook = nix-darwin.lib.darwinSystem {
         system = "aarch64-darwin";
-        specialArgs = { inherit anker; };
+        specialArgs = { inherit anker nixpkgs-latest; };
         modules = [
           ./hosts/macbook/configuration.nix
         ];
@@ -86,7 +91,7 @@
         system = "x86_64-linux";
         # Flake inputs that modules need directly.
         # inherit is shorthand for termfilechooser = termfilechooser; anker = anker;
-        specialArgs = { inherit termfilechooser anker; };
+        specialArgs = { inherit termfilechooser anker nixpkgs-latest; };
         modules = [
           nixvim.nixosModules.nixvim
           ./hosts/north/configuration.nix

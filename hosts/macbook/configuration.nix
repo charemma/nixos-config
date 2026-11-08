@@ -10,6 +10,7 @@
     ../../modules/syncthing-darwin.nix
     ../../modules/mutagen-code-darwin.nix
     ../../modules/dev.nix
+    ../../modules/music.nix
     ../../modules/mitmproxy-ca.nix
   ];
 
