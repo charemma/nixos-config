@@ -20,6 +20,7 @@
     anker.packages.${pkgs.system}.default
     bat
     direnv
+    duckdb
     fastfetch
     fd
     fzf
