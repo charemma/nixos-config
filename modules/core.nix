@@ -42,7 +42,11 @@
     gh
     htop
     jq
-    mitmproxy
+    # test_emudhra fails against the current CA bundle (certificate rejected);
+    # unrelated to our use, so skip it until nixpkgs fixes the package.
+    (mitmproxy.overridePythonAttrs (old: {
+      disabledTests = (old.disabledTests or [ ]) ++ [ "test_emudhra" ];
+    }))
     mpv
     python3
     ripgrep
