@@ -358,6 +358,11 @@
     # Sleuth (auto-detect tabstop/shiftwidth)
     plugins.sleuth.enable = true;
 
+    # nixvim evaluates its own nixpkgs instance, so the host's allowUnfree
+    # does not apply here. copilot-language-server is unfree.
+    nixpkgs.config.allowUnfreePredicate = pkg:
+      builtins.elem (lib.getName pkg) [ "copilot-language-server" ];
+
     # AI code completion (Copilot-compatible inline suggestions)
     plugins.copilot-lua = {
       enable = true;
