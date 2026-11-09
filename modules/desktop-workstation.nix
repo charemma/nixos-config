@@ -187,7 +187,6 @@ in {
   # already installs vi/vim aliases and sets EDITOR/VISUAL.
 
   environment.systemPackages = with pkgs; [
-    brave
     dunst
     feh
     i3lock-color

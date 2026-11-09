@@ -47,11 +47,14 @@
     # Lets single packages track a newer revision without bumping the whole
     # system (and k3s on vps/aiagent). Bump with `nix flake update nixpkgs-latest`.
     nixpkgs-latest.url = "github:NixOS/nixpkgs/nixos-unstable";
+
+    # Declarative Flatpak management, for apps that left nixpkgs (Brave).
+    nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=latest";
   };
 
   # outputs is a function that receives all inputs and returns an attribute set.
   # The `self` argument refers to this flake itself (useful for referencing its own outputs).
-  outputs = { self, nixpkgs, nix-darwin, disko, nixos-hardware, nixos-raspberrypi, termfilechooser, anker, nixvim, nixpkgs-latest, ... }:
+  outputs = { self, nixpkgs, nix-darwin, disko, nixos-hardware, nixos-raspberrypi, termfilechooser, anker, nixvim, nixpkgs-latest, nix-flatpak, ... }:
   let
     # Helper to produce one attribute per supported system without repeating the list.
     # Used for devShells which need to work on all platforms.
@@ -94,6 +97,7 @@
         specialArgs = { inherit termfilechooser anker nixpkgs-latest; };
         modules = [
           nixvim.nixosModules.nixvim
+          nix-flatpak.nixosModules.nix-flatpak
           ./hosts/north/configuration.nix
         ];
       };

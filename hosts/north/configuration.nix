@@ -10,6 +10,7 @@
       ./hardware-configuration.nix
       ../../modules/desktop-wm.nix
       ../../modules/desktop-workstation.nix
+      ../../modules/flatpak.nix
       ../../modules/core.nix
       ../../modules/networking-resilience.nix
       ../../modules/syncthing-nixos.nix
