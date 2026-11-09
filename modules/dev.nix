@@ -11,13 +11,13 @@
   # would OVERWRITE the whole PATH (wiping /bin, /usr/bin, nix paths) -- which
   # breaks every shell. macOS shells get ~/.npm-global/bin from the dotfiles, so
   # only set this off darwin.
-  environment.variables.PATH = lib.mkIf (!pkgs.stdenv.isDarwin) [ "$HOME/.npm-global/bin" ];
+  environment.variables.PATH = lib.mkIf (!pkgs.stdenv.hostPlatform.isDarwin) [ "$HOME/.npm-global/bin" ];
 
   # vim -> nvim alias for muscle memory (nixvim.nix sets EDITOR)
   environment.shellAliases.vim = "nvim";
 
   environment.systemPackages = with pkgs; [
-    anker.packages.${pkgs.system}.default
+    anker.packages.${pkgs.stdenv.hostPlatform.system}.default
     bat
     direnv
     duckdb
@@ -53,5 +53,5 @@
   ]
   # Codex CLI (standalone installer, not Nix) uses bubblewrap for its Linux
   # sandbox. Linux-only, so skip it on the macbook.
-  ++ lib.optionals pkgs.stdenv.isLinux [ pkgs.bubblewrap ];
+  ++ lib.optionals pkgs.stdenv.hostPlatform.isLinux [ pkgs.bubblewrap ];
 }

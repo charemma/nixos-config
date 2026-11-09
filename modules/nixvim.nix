@@ -406,7 +406,7 @@
     # Extra tools available in PATH for formatters/linters
     extraPackages = with pkgs; [
       # Formatters (LSP servers are managed by NixVim)
-      nixfmt-rfc-style
+      nixfmt
       prettier
       ruff
       shfmt

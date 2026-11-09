@@ -15,7 +15,7 @@
   nix.gc = {
     automatic = true;
     options = "--delete-older-than 30d";
-  } // (if pkgs.stdenv.isDarwin
+  } // (if pkgs.stdenv.hostPlatform.isDarwin
     then { interval = { Weekday = 0; Hour = 4; Minute = 0; }; }
     else { dates = "weekly"; });
 

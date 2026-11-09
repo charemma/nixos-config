@@ -8,8 +8,8 @@
 
 let
   # Select the default package for the current system from the flake output.
-  # pkgs.system is e.g. "x86_64-linux".
-  termfilechooserPkg = termfilechooser.packages.${pkgs.system}.default;
+  # pkgs.stdenv.hostPlatform.system is e.g. "x86_64-linux".
+  termfilechooserPkg = termfilechooser.packages.${pkgs.stdenv.hostPlatform.system}.default;
 
   # simple-scan post-processing script: OCR the freshly scanned PDF.
   # Configure simple-scan preferences to run "ocr-script" as post-processor.
