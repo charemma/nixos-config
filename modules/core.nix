@@ -33,6 +33,9 @@
 
   environment.systemPackages = with pkgs; [
     arp-scan
+    # agg turns asciinema recordings into GIFs; nixpkgs' plain `agg` is the
+    # Anti-Grain Geometry C++ library, not this tool.
+    asciinema-agg
     chezmoi
     curl
     fd
@@ -54,6 +57,9 @@
     tmux
     tree
     unzip
+    # Terminal recordings from scripted tapes. hiPrio because gobuster also
+    # ships a bin/vhs (on north via infosec.nix) and would otherwise shadow it.
+    (lib.hiPrio vhs)
     wget
     zip
   ];
