@@ -5,13 +5,45 @@
 # lib provides utility functions (mkDefault, mkOption, types, ...).
 { config, lib, pkgs, ... }:
 
+let
+  # Rollback depth: the weekly GC keeps only this many system generations.
+  keepSystemGenerations = 3;
+
+  # Runs right before the weekly GC. NixOS hooks into systemd, nix-darwin into
+  # launchd, and only the matching option set exists on each platform. The
+  # check uses `options` inside an explicit `config` because branching on pkgs
+  # here would recurse (pkgs itself depends on config).
+  systemGenerationLimit = { config, lib, options, pkgs, ... }:
+    let
+      gc = config.nix.gc;
+      nixBin = "${config.nix.package}/bin";
+      pruneSystemGenerations = "${nixBin}/nix-env --delete-generations +${toString keepSystemGenerations} --profile /nix/var/nix/profiles/system";
+    in
+    {
+      config = lib.mkMerge [
+        (lib.optionalAttrs (options ? systemd) {
+          systemd.services.nix-gc.preStart = lib.mkIf gc.automatic pruneSystemGenerations;
+          # Boot menu matches the generations that survive the GC.
+          boot.loader.systemd-boot.configurationLimit = keepSystemGenerations;
+        })
+        (lib.optionalAttrs (options ? launchd) {
+          launchd.daemons.nix-gc.command = lib.mkIf gc.automatic (lib.mkForce (toString
+            (pkgs.writeShellScript "nix-gc" ''
+              ${pruneSystemGenerations}
+              exec ${nixBin}/nix-collect-garbage ${gc.options}
+            '')));
+        })
+      ];
+    };
+in
 {
-  imports = [ ./binary-cache.nix ];
+  imports = [ ./binary-cache.nix systemGenerationLimit ];
 
   # Weekly garbage collection. north's root filled up during a deploy because
-  # the store had never been collected (42 GB of dead paths). Keep a month of
-  # generations so a rollback stays possible; the schedule option differs
-  # between NixOS (dates) and nix-darwin (interval).
+  # the store had never been collected (42 GB of dead paths). Before each run
+  # only the newest keepSystemGenerations system generations are kept (see
+  # systemGenerationLimit); generations of other profiles go after a month.
+  # The schedule option differs between NixOS (dates) and nix-darwin (interval).
   nix.gc = {
     automatic = true;
     options = "--delete-older-than 30d";
