@@ -222,6 +222,8 @@ in {
     xterm
     # vncviewer for VM consoles and remote desktops
     tigervnc
+    # Claude Code's voice dictation records through SoX's `rec` on Linux
+    sox
     # overrideAttrs patches the build phase of the SDDM theme to inject our wallpaper.
     # The sed commands replace placeholders in theme.conf with the actual file path.
     # ${../assets/background-blurred.png} is a Nix path -- it gets copied to the store
