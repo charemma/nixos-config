@@ -166,6 +166,12 @@ in {
   programs.appimage = {
     enable = true;
     binfmt = true;
+    # nixpkgs dropped libgcrypt and libgpg-error from appimage-run's default
+    # FHS libraries; AppImages like Viber still link against them and fail
+    # with "libgpg-error.so.0: cannot open shared object file".
+    package = pkgs.appimage-run.override {
+      extraPkgs = pkgs: [ pkgs.libgcrypt pkgs.libgpg-error ];
+    };
   };
   services.avahi = {
     # Avahi implements mDNS/DNS-SD for local network service discovery (e.g. network printers).
