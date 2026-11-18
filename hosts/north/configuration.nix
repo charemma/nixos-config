@@ -17,6 +17,7 @@
       ../../modules/dev.nix
       ../../modules/music.nix
       ../../modules/docker.nix
+      ../../modules/incus.nix
       ../../modules/libvirt.nix
       ../../modules/nixvim.nix
       ../../modules/remote-desktop.nix
